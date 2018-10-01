@@ -8,6 +8,7 @@ use Cache;
 use Illuminate\Http\Request;
 use App\Notifications\EmailVerificationNotification;
 use Mail;
+use App\Exceptions\InvalidRequestException;
 
 class EmailVerificationController extends Controller
 {
@@ -17,15 +18,15 @@ class EmailVerificationController extends Controller
     	$token = $request->input('token');
 
     	if (!$email || !$token) {
-    		throw new Exception('The verification link is incorrect!');
+    		throw new InvalidRequestException('The verification link is incorrect!');
     	}
 
     	if ($token != Cache::get('email_verification_'.$email)) {
-    		throw new Exception('The verification link is incorrect or expired!');
+    		throw new InvalidRequestException('The verification link is incorrect or expired!');
     	}
 
     	if (!$user = User::where('email', $email)->first()) {
-    		throw new Exception("The user doesn't exist! ");
+    		throw new InvalidRequestException("The user doesn't exist! ");
     	}
 
     	Cache::forget('email_verification_'.$email);
@@ -40,7 +41,7 @@ class EmailVerificationController extends Controller
     	$user = $request->user();
 
     	if ($user->email_verified) {
-    		throw new Exception('Your email already verified.');
+    		throw new InvalidRequestException('Your email already verified.');
     	}
 
     	$user->notify(new EmailVerificationNotification());
