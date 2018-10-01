@@ -9,7 +9,7 @@
   </div>
   <div class="panel-body text-center">
 	<h1>Please verify email</h1>
-	<a href=" {{ route('root') }}" class="btn btn-primary">Return to home page</a>
+	<a class="btn btn-primary" href="{{ route('email_verification.send') }}">Please send verification email again!</a>
   </div>
 </div>
 
