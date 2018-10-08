@@ -20,6 +20,8 @@
     },
     "dependencies": {
         "ajv": "^6.5.4",
-        "minimist": "^1.2.0"
+        "country-data": "^0.0.31",
+        "minimist": "^1.2.0",
+        "vue-google-autocomplete": "^1.1.0"
     }
 }

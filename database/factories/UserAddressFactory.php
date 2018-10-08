@@ -5,24 +5,23 @@ use Faker\Generator as Faker;
 $factory->define(App\Models\UserAddress::class, function (Faker $faker) {
 
 	$addresses = [
-		["NSW", "Sydney", "Blacktown"],
-		["NSW", "Sydney", "Penrith"],
-		["NSW", "Sydney", "Castle hill"],
-		["QLD", "Brsibane", "Toowong"],
-		["QLD", "Brsibane", "St Lucia"],
-		["VIC", "Melbourne", "Dandenong"],
-		["VIC", "Melbourne", "Frankton"],
+		["NSW", "Blacktown"],
+		["NSW", "Penrith"],
+		["NSW", "Castle hill"],
+		["QLD", "Toowong"],
+		["QLD", "St Lucia"],
+		["VIC", "Dandenong"],
+		["VIC", "Frankton"],
 	];
 
 	$address = $faker->randomElement($addresses);
 
 
     return [
-        'province' => $address[0],
-        'city' => $address[1],
-        'district' => $address[2],
+        'state' => $address[0],
+        'suburb' => $address[1],
         'address'  => $faker->streetAddress,
-        'zip' => $faker->postcode,
+        'postcode' => $faker->postcode,
         'contact_name' => $faker->name,
         'contact_phone' => $faker->phoneNumber,
     ];

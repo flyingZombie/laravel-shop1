@@ -8,6 +8,7 @@
 	<meta name="csrf-token" content="{{ csrf_token() }}">
 	<title>@yield('title', 'Laravel Shop') - Laravel e-commence</title>
 	<link rel="stylesheet" href="{{ mix('css/app.css') }}">
+	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCoORpQwhqYeqsS-dRyFeO_oe1DuGt92w0&libraries=places"></script>
 </head>
 <body>
 	<div id="app" class="{{ route_class()}}-page">
