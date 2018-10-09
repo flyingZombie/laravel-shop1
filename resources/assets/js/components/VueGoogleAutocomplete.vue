@@ -67,7 +67,34 @@
           geolocationOptions: {
             type: Object,
             default: null
+          },
+
+          initAddress: {
+            type: String,
+            default: ''
+          },
+
+          initState: {
+            type: String,
+            default: ''
+          },
+
+          initSuburb: {
+            type: String,
+            default: ''
+          },
+
+          initPostcode: {
+            type: String,
+            default: ''
+          },
+
+          initCountry: {
+            type: String,
+            default: ''
           }
+
+
         },
 
         data() {
@@ -84,7 +111,7 @@
                  * Autocomplete input text
                  * @type {String}
                  */
-                autocompleteText: '',
+                autocompleteText: this.initAddress+','+this.initSuburb+' '+this.initState+','+this.initPostcode,
 
                 /**
                  * The address components object

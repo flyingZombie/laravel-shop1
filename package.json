@@ -22,6 +22,7 @@
         "ajv": "^6.5.4",
         "country-data": "^0.0.31",
         "minimist": "^1.2.0",
+        "sweetalert": "^2.1.0",
         "vue-google-autocomplete": "^1.1.0"
     }
 }

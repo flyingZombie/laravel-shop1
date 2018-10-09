@@ -1,11 +1,16 @@
 <template>
-	<div>
+<div>
 <vue-google-autocomplete @change="onAddressChanged"
                     id="map"
                     ref="address"
                     classname="form-control"
                     placeholder="Start typing"
                     :addressComponents="onAddressChanged"
+                    :initAddress="initAddress"
+                    :initSuburb="initSuburb"
+                    :initState="initState"
+                    :initPostcode="initPostcode"
+                    :initCountry="initCountry"
                     country="au"
                 >
             </vue-google-autocomplete>
@@ -29,13 +34,41 @@
         	VueGoogleAutocomplete
         },
 
+        props: {
+
+          	initState: {
+          		type: String,
+          		default: ''
+          	},
+
+          	initSuburb: {
+          		type: String,
+          		default: ''
+          	},
+
+          	initPostcode: {
+          		type: String,
+          		default: ''
+          	},
+
+          	initAddress: {
+            	type: String,
+            	default: ''
+          	},
+
+          	initCountry: {
+          		type: String,
+          		default:'au'
+          	}
+        },
+
 		data() {
 				return {
-					state: '',
-					suburb: '',
-					postcode: '',
-					country: '',
-					address: '',
+					state: this.initState,
+					suburb: this.initSuburb,
+					postcode: this.initPostcode,
+					country: this.initCountry,
+					address: this.initAddress,
 				}
 		},
 

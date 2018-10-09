@@ -3,6 +3,8 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use App\Models\UserAddress;
+use App\Policies\UserAddressPolicy;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -25,4 +27,8 @@ class AppServiceProvider extends ServiceProvider
     {
         //
     }
+
+    protected $policies = [
+
+    ];
 }
