@@ -111,7 +111,7 @@
                  * Autocomplete input text
                  * @type {String}
                  */
-                autocompleteText: this.initAddress+','+this.initSuburb+' '+this.initState+','+this.initPostcode,
+                autocompleteText: this.initAddress?this.initAddress+',':''+this.initSuburb+' '+this.initState?this.initState+',':''+this.initPostcode,
 
                 /**
                  * The address components object
