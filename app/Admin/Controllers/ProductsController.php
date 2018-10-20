@@ -56,8 +56,7 @@ class ProductsController extends Controller
     {
         return Admin::content(function (Content $content) {
 
-            $content->header('header');
-            $content->description('description');
+            $content->header('Create Product');
 
             $content->body($this->form());
         });
@@ -82,7 +81,7 @@ class ProductsController extends Controller
             $grid->review_count('Review Count');
 
             $grid->actions(function ($actions) {
-                $actions->disableView();
+                //$actions->disableView();
                 $actions->disableDelete();
             });
             $grid->tools(function ($tools) {
@@ -102,10 +101,25 @@ class ProductsController extends Controller
     {
         return Admin::form(Product::class, function (Form $form) {
 
-            $form->display('id', 'ID');
+            $form->text('title', 'Name')->rules('required');
 
-            $form->display('created_at', 'Created At');
-            $form->display('updated_at', 'Updated At');
+            $form->image('image', 'Image')->rules('required|image');
+
+            $form->editor('description', 'Desc')->rules('required');
+
+            $form->radio('on_sale', 'On Sale')->options(['1' => '是', '0'=> '否'])->default('0');
+
+            $form->hasMany('skus', 'SKU List', function (Form\NestedForm $form) {
+                $form->text('title', 'SKU Name')->rules('required');
+                $form->text('description', 'SKU Desc')->rules('required');
+                $form->text('price', 'Price')->rules('required|numeric|min:0.01');
+                $form->text('stock', 'On Stock')->rules('required|integer|min:0');
+            });
+
+            $form->saving(function (Form $form) {
+                $form->model()->price = collect($form->input('skus'))->where(Form::REMOVE_FLAG_NAME, 0)->min('price') ?: 0;
+            });
         });
+
     }
 }
