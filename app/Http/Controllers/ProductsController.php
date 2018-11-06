@@ -43,4 +43,12 @@ class ProductsController extends Controller
     		],
     		]);
     }
+
+    public function show(Product $product, Request $request)
+    {
+    	if (!$product->on_sale) {
+    		throw new InvalidRequestException('This product is not for sale');
+    	}
+    	return view('products.show', ['product' => $product]);
+    }
 }
