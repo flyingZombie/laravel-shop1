@@ -35,7 +35,12 @@
         </div>
         <div class="cart_amount"><label>Cart amount</label><input type="text" class="form-control input-sm" value="1"><span>Pieces</span><span class="stock"></span></div>
         <div class="buttons">
+
+          @if($favored)
+          <button class="btn btn-danger btn-disfavor">Disfavor</button>
+          @else 
           <button class="btn btn-success btn-favor">❤ Add favor</button>
+          @endif
           <button class="btn btn-primary btn-add-to-cart">Add to shopping cart</button>
         </div>
       </div>
@@ -62,10 +67,39 @@
 @section('scriptsAfterJs')
 <script>
   $(document).ready(function () {
+
     $('[data-toggle="tooltip"]').tooltip({trigger: 'hover'});
     $('.sku-btn').click(function () {
       $('.product-info .price span').text($(this).data('price'));
       $('.product-info .stock').text('Stock: ' + $(this).data('stock') + 'Piece');
+    });
+
+    $('.btn-favor').click(function () {
+      axios.post('{{ route('products.favor', ['product' => $product->id ])}}')
+      .then(function () {
+        swal('Success', '', 'success')
+        .then(function () {
+          location.reload();
+        });
+      }, function(error) {
+        if (error.response && error.response.status === 401) {
+          swal('Please log in first', '', 'error');
+        } else if ( error.response && error.response.data.msg) {
+          swal(error.response.data.msg, '', 'error');
+        } else {
+          swal('System error', '', 'error');
+        }
+      });
+    });
+
+    $('.btn-disfavor').click(function () {
+      axios.delete(' {{ route('products.disfavor', ['product' => $product->id ]) }}')
+      .then(function () {
+        swal('Success', '', 'success')
+        .then(function () {
+          location.reload();
+        });
+      });
     });
   });
 
