@@ -103,11 +103,15 @@
     });
 
     $('.btn-add-to-cart').click(function () {
+
       axios.post('{{ route('cart.add') }}', {
         sku_id: $('label.active input[name=skus]').val(),
         amount: $('.cart_amount input').val(),
       }).then(function () {
-        swal('Successfully added into shopping cart', '', 'success');
+        swal('Successfully added into shopping cart', '', 'success')
+        .then(function () {
+          location.href = '{{ route('cart.index') }}'
+        });
       }, function (error) {
         if (error.response.status === 401) {
           swal('Please log in first', '', 'error');
