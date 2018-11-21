@@ -154,7 +154,9 @@
 
       axios.post('{{ route('orders.store') }}', req)
       .then(function (response) {
-        swal('Order submitted', '', 'success');
+        swal('Order submitted', '', 'success').then(() => {
+          location.href = '/orders/' + response.data.id;
+        });
       }, function (error) {
         if (error.response.status === 422) {
           var html = '<div>';

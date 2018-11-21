@@ -61,7 +61,9 @@
                     otherwise the order will be closed
                   @endif
                 </td>
-                <td rowspan="{{ count($order->items) }}" class="text-center"><a class="btn btn-primary btn-xs" href="">View Order</a></td>
+                <td rowspan="{{ count($order->items) }}" class="text-center">
+                  <a class="btn btn-primary btn-xs" href=" {{ route('orders.show', ['order' => $order->id ]) }}">View Order</a>
+                </td>
                 @endif
               </tr>
               @endforeach
