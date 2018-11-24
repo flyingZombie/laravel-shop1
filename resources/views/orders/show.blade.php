@@ -53,6 +53,7 @@
           <span>Order Total Amout：</span>
           <div class="value">${{ $order->total_amount }}</div>
         </div>
+
         <div>
           <span>Order Status：</span>
           <div class="value">
@@ -69,6 +70,12 @@
             @endif
           </div>
         </div>
+		
+		@if(!$order->paid_at && !$order->closed)
+		<div class="payment-buttons">
+			<a class="btn btn-primary btn-sm" href="{{ route('payment.alipay',['order' => $order->id]) }}">Pay via Alipay</a>
+		</div>
+		@endif
       </div>
     </div>
   </div>
