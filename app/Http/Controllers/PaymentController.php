@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Order;
 use App\Exceptions\InvalidRequestException;
 use Carbon\Carbon;
+use App\Events\OrderPaid;
 
 class PaymentController extends Controller
 {
@@ -56,6 +57,52 @@ class PaymentController extends Controller
 			'payment_no' => $data->trade_no,
 		]);
 
+		$this->afterPaid($order);
+
 		return app('alipay')->success();
+	}
+
+	public function payByWechat(Order $order, Request $request)
+	{
+		$this->authorize('own', $order);
+
+		if ($order->paid_at || $order->closed) {
+			throw new InvalidRequestException('Order status is incorrect');
+		}
+
+		$wechatOrder = app('wechat_pay')->scan([
+			'out_trade_no' => $order->no,
+			'total_fee' => $order->total_amount * 100,
+			'body' => 'Pay order: '.$order->no,
+		]);
+
+		$qrCode = new QrCode($wechatOrder->code_url);
+
+		return response($qrCode->writeString(), 200, ['Contect-Type' => $qrCode->getContentType()]);
+	}
+
+	public function wechatNotify()
+	{
+		$data = app('wechat_pay')->verify();
+		$order = Order::where('no', $data->out_trade_no)->first();
+		if (!$order) {
+			return 'fail';
+		}
+		if ($order->paid_at) {
+			return app('wechat_pay')->success();
+		}
+		$order->update([
+			'paid_at' => Carbon::now(),
+			'payment_method' => 'wechat',
+			'payment_no' => $data->transaction_id,
+		]);
+
+		$this->afterPaid($order);
+
+		return app('wechat_pay')->success();
+	}
+
+	protected function afterPaid(Order $order) {
+		event(new OrderPaid($order));
 	}
 }

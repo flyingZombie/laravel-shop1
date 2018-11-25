@@ -73,7 +73,8 @@
 		
 		@if(!$order->paid_at && !$order->closed)
 		<div class="payment-buttons">
-			<a class="btn btn-primary btn-sm" href="{{ route('payment.alipay',['order' => $order->id]) }}">Pay via Alipay</a>
+		<a class="btn btn-primary btn-sm" href="{{ route('payment.alipay',['order' => $order->id]) }}">Pay via Alipay</a>
+	    <a class="btn btn-primary btn-sm" id = 'btn-wechat'>Pay via Weichat</a>
 		</div>
 		@endif
       </div>
@@ -83,3 +84,22 @@
 </div>
 </div>
 @endsection
+
+@section('scriptsAfterJs')
+<script>
+	$(document).ready(function () {
+		$('#btn-wechat').click(function () {
+			swal({
+				content: $('<img src="{{ route('payment.wechat', ['order' => $order->id]) }}" />')[0],
+				buttons: ['Close', 'Payment finished'],
+			})
+			.then(function (result) {
+				if (result) {
+					location.reload();
+				}
+			})
+		});
+	});
+</script>
+@endsection
+
