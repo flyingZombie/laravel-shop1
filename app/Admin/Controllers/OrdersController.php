@@ -123,4 +123,13 @@ class OrdersController extends Controller
             $form->display('updated_at', 'Updated At');
         });
     }
+
+    public function show(Order $order)
+    {
+        return Admin::content(function (Content $content) use ($order)
+        {
+            $content->header('View order');
+            $content->body(view('admin.orders.show', ['order' => $order]));
+        });
+    }
 }
