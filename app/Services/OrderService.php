@@ -23,9 +23,9 @@ class OrderService
 			$order = new Order([
 				'address' => [
 					'address' => $address->full_address,
-					'zip' => $address->zip,
-					'contact_name => $address->contact_name',
-					'contact_phone => $address->contact_phone',
+					'postcode' => $address->postcode,
+					'contact_name' => $address->contact_name,
+					'contact_phone' => $address->contact_phone,
 				],
 				'remark' => $remark,
 				'total_amount' => 0,

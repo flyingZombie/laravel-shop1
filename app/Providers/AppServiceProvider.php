@@ -27,10 +27,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        
         $this->app->singleton('alipay', function ()
         {
             $config = config('pay.alipay');
-            $config['notify_url'] = route('payment.alipay.notify');
+            //$config['notify_url'] = route('payment.alipay.notify');
+            $config['notify_url'] = 'http://requestbin.leo108.com/wafdy6wa';
             $config['return_url'] = route('payment.alipay.return');
             if (app()->environment() !== 'product') {
                 $config['mode'] = 'dev';
@@ -51,6 +53,7 @@ class AppServiceProvider extends ServiceProvider
             }
             return Pay::wechat($config);
         });
+        
     }
 
     protected $policies = [

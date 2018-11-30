@@ -44,9 +44,14 @@
 	
 	<div class="order-bottom">
       <div class="order-info">
-        <div class="line"><div class="line-label">Receiving Address: </div><div class="line-value">{{ join(' ', $order->address) }}</div></div>
-        <div class="line"><div class="line-label">Order Remark:</div><div class="line-value">{{ $order->remark ?: '-' }}</div></div>
-        <div class="line"><div class="line-label">Order No.</div><div class="line-value">{{ $order->no }}</div></div>
+        <div class="line">
+        	<div class="line-label">Receiving Address: </div>
+        	<div class="line-value">{{ join(' ', $order->address) }}</div>
+        </div>
+        <div class="line">
+        	<div class="line-label">Order Remark:</div>
+        	<div class="line-value">{{ $order->remark ?: '-' }}</div></div>
+        <div class="line"><div class="line-label">Order No. : </div><div class="line-value">{{ $order->no }}</div></div>
       </div>
       <div class="order-summary text-right">
         <div class="total-amount">

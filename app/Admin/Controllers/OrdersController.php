@@ -9,6 +9,8 @@ use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
 use App\Http\Controllers\Controller;
 use Encore\Admin\Controllers\ModelForm;
+use Illuminate\Http\Request;
+use App\Exceptions\InvalidRequestException;
 
 class OrdersController extends Controller
 {
@@ -131,5 +133,30 @@ class OrdersController extends Controller
             $content->header('View order');
             $content->body(view('admin.orders.show', ['order' => $order]));
         });
+    }
+
+    public function ship(Order $order, Request $request)
+    {
+        if (!$order->paid_at) {
+            throw new InvalidRequestException('This order is not paid yet!');
+        }
+
+        if ($order->shop_status !== Order::SHIP_STATUS_PENDING) {
+            throw new InvalidRequestException('This order has been delivered already!');
+        }
+
+        $data = $this->validate($request, [
+            'express_company' => ['required'],
+            'express_no' => ['required'], 
+         ], [], [
+            'express_company' => 'Shipping Company',
+            'express_no' => 'Shipping No.'
+        ]);
+
+        $order->update([
+            'ship_status' => Order::SHIP_STATUS_DELIVERED,
+            'ship_data' => $data,
+        ]);
+        return redirect()->back();
     }
 }

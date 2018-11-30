@@ -28,6 +28,12 @@ class PaymentController extends Controller
 	//frontend callback
 	public function alipayReturn()
 	{
+		/*
+		$data = app('alipay')->verify();
+
+		dd($data);
+		*/
+		
 		try {
 			app('alipay')->verify();
 		} catch (\Exception $e) {
@@ -35,10 +41,17 @@ class PaymentController extends Controller
 		}
 
 		return view('pages.success', ['msg' => 'Payment is successful!']);
+		
 	}
 
 	public function alipayNotify()
 	{
+		/*
+		$data = app('alipay')->verify();
+
+		\Log::debug('Alipay notify, $data->all()');
+		*/
+		
 		$data = app('alipay')->verify();
 		if(!in_array($data->trade_status, ['TRADE_SUCCESS', 'TRADE_FINISHED'])) {
 			return app('alipay')->success();
@@ -60,6 +73,7 @@ class PaymentController extends Controller
 		$this->afterPaid($order);
 
 		return app('alipay')->success();
+		
 	}
 
 	public function payByWechat(Order $order, Request $request)
