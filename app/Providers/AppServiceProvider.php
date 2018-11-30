@@ -32,7 +32,7 @@ class AppServiceProvider extends ServiceProvider
         {
             $config = config('pay.alipay');
             //$config['notify_url'] = route('payment.alipay.notify');
-            $config['notify_url'] = 'http://requestbin.leo108.com/wafdy6wa';
+            $config['notify_url'] = 'http://requestbin.leo108.com/xrr3noxr';
             $config['return_url'] = route('payment.alipay.return');
             if (app()->environment() !== 'product') {
                 $config['mode'] = 'dev';

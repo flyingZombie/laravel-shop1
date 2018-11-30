@@ -134,17 +134,17 @@ class OrdersController extends Controller
             $content->body(view('admin.orders.show', ['order' => $order]));
         });
     }
-
+    
     public function ship(Order $order, Request $request)
     {
         if (!$order->paid_at) {
             throw new InvalidRequestException('This order is not paid yet!');
         }
 
-        if ($order->shop_status !== Order::SHIP_STATUS_PENDING) {
+        if ($order->ship_status !== Order::SHIP_STATUS_PENDING) {
             throw new InvalidRequestException('This order has been delivered already!');
         }
-
+        
         $data = $this->validate($request, [
             'express_company' => ['required'],
             'express_no' => ['required'], 
@@ -152,6 +152,7 @@ class OrdersController extends Controller
             'express_company' => 'Shipping Company',
             'express_no' => 'Shipping No.'
         ]);
+    
 
         $order->update([
             'ship_status' => Order::SHIP_STATUS_DELIVERED,
@@ -159,4 +160,5 @@ class OrdersController extends Controller
         ]);
         return redirect()->back();
     }
+
 }

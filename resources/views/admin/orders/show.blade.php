@@ -80,8 +80,9 @@
 							Shipping Number
 						</label>
 						<input type="text" name="express_no" value="" id="express_no" class="form-control" placeholder="Input shipping number">
+
 						@if($errors->has('express_no'))
-						  @@foreach ($errors->get('express_no') as $msg)
+						  @foreach ($errors->get('express_no') as $msg)
 						  	<span class="help-block">{{ $msg }}</span>
 						  @endforeach
 						@endif
