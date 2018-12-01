@@ -51,7 +51,29 @@
         <div class="line">
         	<div class="line-label">Order Remark:</div>
         	<div class="line-value">{{ $order->remark ?: '-' }}</div></div>
-        <div class="line"><div class="line-label">Order No. : </div><div class="line-value">{{ $order->no }}</div></div>
+        <div class="line">
+        	<div class="line-label">Order No. : </div>
+        	<div class="line-value">{{ $order->no }}</div>
+        </div>
+        <div class="line">
+        	<div class="line-label">
+        		Shipping Status:
+        	</div>
+        	<div class="line-value">
+        		{{ \App\Models\Order::$shipStatusMap[$order->ship_status]  }}
+        	</div>
+        	@if($order->ship_data)
+			  <div class="line">
+			  	<div class="line-label">
+			  		Shipping Infor:
+			  	</div>
+			  	<div class="line-value">
+			  		{{ $order->ship_data['express_company']}}
+			  		  {{ $order->ship_data['express_no'] }}
+			  	</div>
+			  </div>
+        	@endif
+        </div>
       </div>
       <div class="order-summary text-right">
         <div class="total-amount">
@@ -82,6 +104,13 @@
 	    <a class="btn btn-primary btn-sm" id = 'btn-wechat'>Pay via Weichat</a>
 		</div>
 		@endif
+
+		@if($order->ship_status === \App\Models\Order::SHIP_STATUS_DELIVERED)
+		  <div class="receive-button">
+		  	<button type="button" id="btn-receive" class="btn btn-sm btn-success">Confirm Received</button>
+		  </div>
+		@endif
+
       </div>
     </div>
   </div>
@@ -103,6 +132,25 @@
 					location.reload();
 				}
 			})
+		});
+
+		$('#btn-receive').click(function () {
+			swal({
+				title: 'Received the product ordered?',
+				icon: 'warning',
+				buttons: true,
+				dangerMode: true,
+				buttons: ['Cancel', 'Confirm received'],
+			})
+			.then(function (ret) {
+				if (!ret) {
+					return;
+				}
+				axios.post(' {{ route('orders.received', ['$order->id']) }}')
+				.then(function () {
+					location.reload();
+				})
+			});
 		});
 	});
 </script>

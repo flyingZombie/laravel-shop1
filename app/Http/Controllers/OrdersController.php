@@ -40,5 +40,19 @@ class OrdersController extends Controller
 		return view('orders.show', ['order' => $order->load(['items.productSku', 'items.product'])]);
 	}
 
+	public function received(Order $order, Request $request)
+	{
+		$this->authorize('own', $order);
+
+		if ($order->ship_status !== Order::SHIP_STATUS_DELIVERED) {
+			throw new InvalidRequestException('incorrect shipping status');
+		}
+
+		$order->update(['ship_status' => Order::SHIP_STATUS_RECEIVED]);
+
+		//return redirect()->back(); //apply when using form submit
+		return $order; //apply when using AXIOS ajax
+	}
+
 }
 
