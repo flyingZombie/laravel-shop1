@@ -12,6 +12,8 @@ use App\Jobs\CloseOrder;
 use Illuminate\Http\Request;
 use App\Services\CartService;
 use App\Services\OrderService;
+use App\Http\Requests\SendReviewRequest;
+use App\Events\OrderReviewed;
 
 class OrdersController extends Controller
 {
@@ -54,5 +56,47 @@ class OrdersController extends Controller
 		return $order; //apply when using AXIOS ajax
 	}
 
+	public function review(Order $order)
+	{
+
+		$this->authorize('own', $order);
+		if (!$order->paid_at) {
+			throw new InvalidRequestException('this order is not paid yet and should not be reviewed.');
+		}
+		return view('orders.review', ['order' => $order->load(['items.productSku', 'items.product'])]);
+	}
+
+	public function sendReview(Order $order, SendReviewRequest $request)
+	{
+
+
+		$this->authorize('own', $order);
+
+		if (!$order->paid_at) {
+			throw new InvalidRequestException('This order is not paid yet, can\'t be reviewed');
+		}
+
+		if ($order->reviewed) {
+			throw new InvalidRequestException('This order had been reviewed, no 2nd review');
+		}
+
+		$reviews = $request->input('reviews');
+
+		\DB::transaction(function () use ($reviews, $order)
+		{
+			foreach ($reviews as $review) {
+				$orderItem = $order->items()->find($review['id']);
+
+				$orderItem->update([
+					'rating' => $review['rating'],
+					'review' => $review['review'],
+					'reviewed_at' => Carbon::now(),
+				]);
+			} 
+			$order->update(['reviewed' => true ]);
+			event(new OrderReviewed($order));
+		});
+		return redirect()->back();
+	}
 }
 
