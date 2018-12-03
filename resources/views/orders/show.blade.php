@@ -73,6 +73,26 @@
 			  	</div>
 			  </div>
         	@endif
+
+			@if($order->paid_at && $order->refund_status !== \App\Models\Order::REFUND_STATUS_PENDING)
+				<div class="line">
+					<div class="line-label">
+						Refund Status:
+					</div>
+					<div class="line-value">
+						{{ \App\Models\Order::$refundStatusMap[$order->refund_status] }}
+					</div>
+				</div>
+				<div class="line">
+					<div class="line-label">
+						Refund Reason:
+					</div>
+					<div class="line-value">
+						{{ $order->extra['refund_reason'] }}
+					</div>
+				</div>
+			@endif
+
         </div>
       </div>
       <div class="order-summary text-right">
@@ -111,6 +131,12 @@
 		  </div>
 		@endif
 
+		@if($order->paid_at && $order->refund_status === \App\Models\Order::REFUND_STATUS_PENDING)
+			<div class="refund_button">
+				<button class="btn btn-sm btn-danger" id="btn-apply-refund">Apply for refund</button>
+			</div>
+		@endif
+
       </div>
     </div>
   </div>
@@ -122,6 +148,7 @@
 @section('scriptsAfterJs')
 <script>
 	$(document).ready(function () {
+
 		$('#btn-wechat').click(function () {
 			swal({
 				content: $('<img src="{{ route('payment.wechat', ['order' => $order->id]) }}" />')[0],
@@ -150,6 +177,24 @@
 				.then(function () {
 					location.reload();
 				})
+			});
+		});
+
+		$('#btn-apply-refund').click(function () {
+			swal({
+				text: 'Please input refund reason',
+				content: "input"
+			}).then(function (input) {
+				if(!input) {
+					swal('Refund reason can\'t be blank. ')
+					return;
+				}
+				axios.post('{{ route('orders.apply_refund', [$order->id]) }}', {reason: input})
+				  .then(function () {
+				  	swal('Apply for refund is successful', '', 'success').then(function () {
+				  		location.reload();
+				  	});
+				  });
 			});
 		});
 	});
