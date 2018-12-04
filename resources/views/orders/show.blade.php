@@ -117,6 +117,14 @@
             @endif
           </div>
         </div>
+        @if(isset($order->extra['refund_disagree_reason']))
+			<div>
+				<span>The reason for refusal of refund:</span>
+				<div class="value">
+					{{ $order->extra['refund_disagree_reason']}}
+				</div>
+			</div>
+        @endif
 		
 		@if(!$order->paid_at && !$order->closed)
 		<div class="payment-buttons">

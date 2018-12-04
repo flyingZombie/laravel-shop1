@@ -99,7 +99,62 @@
 				<td>{{ $order->ship_data['express_no']}}</td>
 			</tr>
 			@endif
+
+			@if($order->refund_status !== \App\Models\Order::REFUND_STATUS_PENDING)
+			<tr>
+				<td>Refund Status</td>
+				<td colspan="2">{{ \App\Models\Order::$refundStatusMap[$order->refund_status]}}, Reason: {{ $order->extra['refund_reason']}}
+				</td>
+				<td>
+					@if($order->refund_status === \App\Models\Order::REFUND_STATUS_APPLIED)
+					  <button class="btn btn-sm btn-success" id="btn-refund-agree">Agree</button>
+					  <button class="btn btn-sm btn-danger" id="btn-refund-disagree">Disagree</button>
+					@endif
+				</td>
+			</tr>
+			@endif
 			</tbody>
 		</table>
 	</div>
 </div>
+<script>
+	$(document).ready(function () {
+      $('#btn-refund-disagree').click(function () {
+        swal({
+        	title: 'Please input reason for refusal of refund',
+        	type: 'input',
+        	showCancelButton: true,
+        	closeOnConfirm: false,
+        	confirmButtonText: 'Confirm',
+        	cancelButtonText: 'Cancel',
+        }, function (inputValue) {
+          if (inputValue === false) {
+          	return;
+          }
+          if (!inputValue) {
+          	swal('Reason should not be blank', '', 'error')
+          	return;
+          }
+          $.ajax({
+          	url: '{{ route('admin.orders.handle_refund', [$order->id]) }}',
+          	type: 'POST',
+          	data: JSON.stringify({
+          		agree: false,
+          		reason: inputValue,
+          		_token: LA.token,
+          	}),
+          	contentType: 'application/json',
+          	success: function (data) {
+          	  swal({
+          	  	title: 'Done',
+          	  	type: 'success'
+          	  }, function () {
+                location.reload();
+          	  });
+          	}
+
+          });
+        });
+      });
+	});
+</script>
