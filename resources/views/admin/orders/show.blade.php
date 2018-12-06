@@ -59,6 +59,9 @@
 			</tr>
 
 			@if($order->ship_status === \App\Models\Order::SHIP_STATUS_PENDING)
+
+				@if($order->refund_status !== \App\Models\Order::REFUND_STATUS_SUCCESS)
+
 			<tr>
 				<td colspan="4">
 					<form action="{{ route('admin.orders.ship', [$order->id]) }}" method="post" accept-charset="utf-8" class="form-inline">
@@ -91,6 +94,7 @@
 					</form>
 				</td>
 			</tr>
+					@endif
 			@else 
 			<tr>
 				<td>Shipping Company:</td>
@@ -155,6 +159,38 @@
 
           });
         });
+      });
+	
+      $('#btn-refund-agree').click(function () {
+		  swal({
+			  title: 'Confirm to refund?',
+			  type: 'warning',
+			  showCancelButton: true,
+			  closeOnConfirm: false,
+			  confirmButtonText: 'Confirm',
+			  cancelButtonText: 'Cancel',
+		  }, function (ret) {
+			  if (!ret) {
+			      return;
+			  }
+			  $.ajax({
+				  url: '{{ route('admin.orders.handle_refund', [$order->id]) }}',
+				  type: 'POST',
+				  data: JSON.stringify({
+					  agree: true,
+					  _token: LA.token,
+				  }),
+				  contentType: 'application/json',
+				  success: function (data) {
+					  swal({
+						  title:'Done',
+						  type: 'success'
+					  }, function () {
+						  location.reload();
+                      });
+                  }
+			  });
+          });
       });
 	});
 </script>

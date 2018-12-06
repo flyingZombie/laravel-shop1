@@ -27,12 +27,15 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        
+        if ($this->app->environment() !== 'production') {
+            $this->app->register(\Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class);
+        }
+
         $this->app->singleton('alipay', function ()
         {
             $config = config('pay.alipay');
             //$config['notify_url'] = route('payment.alipay.notify');
-            $config['notify_url'] = 'http://requestbin.leo108.com/1ij3kph1';
+            $config['notify_url'] = 'http://requestbin.leo108.com/q48zsvq4';
             $config['return_url'] = route('payment.alipay.return');
             if (app()->environment() !== 'product') {
                 $config['mode'] = 'dev';
