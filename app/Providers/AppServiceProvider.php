@@ -34,8 +34,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton('alipay', function ()
         {
             $config = config('pay.alipay');
-            //$config['notify_url'] = route('payment.alipay.notify');
-            $config['notify_url'] = 'http://requestbin.leo108.com/q48zsvq4';
+            $config['notify_url'] = route('payment.alipay.notify');
+            //$config['notify_url'] = 'http://requestbin.leo108.com/q48zsvq4';
             $config['return_url'] = route('payment.alipay.return');
             if (app()->environment() !== 'product') {
                 $config['mode'] = 'dev';
@@ -49,6 +49,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton('wechat_pay', function ()
         {
             $config = config('pay.wechat');
+            $config['notify_url'] = route('payment.wechat.notify');
             if (app()->environment() !== 'production') {
                 $config['log']['level'] = Logger::DEBUG;
             } else {

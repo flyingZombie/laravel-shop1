@@ -194,6 +194,22 @@ class OrdersController extends Controller
         switch ($order->payment_method) {
             case 'wechat':
 
+                $refundNo = Order::getAvailableRefundNo();
+
+                app('wechat_pay')->refund([
+                    'out_trade_no' => $order->no,
+                    'total_fee' => $order->total_amount * 100,
+                    'refund_fee' => $order->total_amount * 100,
+                    'out_refund_no' => $refundNo,
+                    //'notify_url' => 'http://requestbin.leo108.com/1ewu0zq1'
+                    'notify_url' => route('payment.wechat.refund_notify'),
+                ]);
+
+                $order->update([
+                  'refund_no' => $refundNo,
+                    'refund_status' => Order::REFUND_STATUS_PROCESSING,
+                ]);
+
                 break;
 
             case 'alipay':

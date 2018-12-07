@@ -52,7 +52,7 @@ Route::post('payment/wechat/notify', 'PaymentController@wechatNotify')->name('pa
 Route::redirect('/', '/products')->name('root');
 Route::get('products', 'ProductsController@index')->name('products.index');
 Route::get('products/{product}', 'ProductsController@show')->name('products.show');
-
+Route::post('payment/wechat/refund_notify', 'PaymentController@wechatRefundNotify')->name('payment.wechat.refund_notify');
 
 Route::get('alipay', function() {
     return app('alipay')->web([
@@ -61,6 +61,8 @@ Route::get('alipay', function() {
         'subject' => 'test subject - 测试',
     ]);
 });
+
+
 
 
 
