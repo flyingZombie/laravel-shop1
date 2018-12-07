@@ -97,6 +97,11 @@ class Order extends Model
     	return $this->hasMany(OrderItem::class);
     }
 
+    public function couponCode()
+    {
+        return $this->belongsTo(CouponCode::class);
+    }
+
     public static function getAvailableRefundNo() {
         do {
             $no = Uuid::uuid4()->getHex();
