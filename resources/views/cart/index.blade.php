@@ -84,6 +84,25 @@
                 <textarea name="remark" class="form-control" rows="3"></textarea>
               </div>
             </div>
+
+            <div class="form-group">
+                <label class="control-label col-sm-3">
+                    Coupon code
+                </label>
+                <div class="col-sm-4">
+                  <input type="text" class="form-control" name="coupon_code">
+                    <span class="help-block" id="coupon_desc"></span>
+                </div>
+                <div class="col-sm-3">
+                    <button type="button" class="btn btn-success" id="btn-check-coupon">
+                        Check
+                    </button>
+                    <button id="btn-cancel-coupon" type="button" class="btn btn-danger" style="display: none;">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+
             <div class="form-group">
               <div class="col-sm-offset-3 col-sm-3">
                 <button type="button" class="btn btn-primary btn-create-order">Submit Order</button>
@@ -171,6 +190,36 @@
           swal('System error', '', 'error');
         }
       });
+    });
+    
+    $('#btn-check-coupon').click(function () {
+        var code = $('input[name=coupon_code]').val();
+        if(!code) {
+            swal('Please input coupon code', '', 'warning');
+            return;
+        }
+        axios.get('/coupon_codes'+encodeURIComponent(code))
+            .then(function (response) {
+                $('#coupon_desc').text(response.data.description);
+                $('input[name=coupon_code]').prop('readonly', true);
+                $('#btn-cancel-coupon').show();
+                $('#btn-check-coupon').hide();
+            }, function (error) {
+                if(error.response.status === 404) {
+                    swal('This coupon code does not exist', '', 'error');
+                } else if (error.response.status === 403) {
+                    swal(error.response.data.msg, '', 'error');
+                } else {
+                    swal('Internal system error', '', 'error');
+                }
+            })
+    });
+    
+    $('#btn-cancel-coupon').click(function () {
+        $('#coupon_desc').text('');
+        $('input[name=coupon_code]').prop('readonly', false);
+        $('#btn-cancel-coupon').hide();
+        $('#btn-check-coupon').show();
     });
   });
 </script>
