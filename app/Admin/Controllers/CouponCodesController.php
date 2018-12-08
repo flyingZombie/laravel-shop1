@@ -49,12 +49,12 @@ class CouponCodesController extends Controller
      * @param Content $content
      * @return Content
      */
-    public function edit($id, Content $content)
+    public function edit($id)
     {
-        return $content
-            ->header('Edit')
-            ->description('description')
-            ->body($this->form()->edit($id));
+        return \Admin::content(function (Content $content) use ($id) {
+            $content->header('Editing coupon');
+            $content->body($this->form()->edit($id));
+        });
     }
 
     /**
@@ -65,10 +65,10 @@ class CouponCodesController extends Controller
      */
     public function create(Content $content)
     {
-        return $content
-            ->header('Create')
-            ->description('description')
-            ->body($this->form());
+        return \Admin::content(function (Content $content) {
+            $content->header('Create new coupon');
+            $content->body($this->form());
+        });
     }
 
     /**
@@ -78,25 +78,6 @@ class CouponCodesController extends Controller
      */
     protected function grid()
     {
-        /*
-        $grid = new Grid(new CouponCode);
-
-        $grid->id('Id');
-        $grid->name('Name');
-        $grid->code('Code');
-        $grid->type('Type');
-        $grid->value('Value');
-        $grid->total('Total');
-        $grid->used('Used');
-        $grid->min_amount('Min amount');
-        $grid->not_before('Not before');
-        $grid->not_after('Not after');
-        $grid->enabled('Enabled');
-        $grid->created_at('Created at');
-        $grid->updated_at('Updated at');
-
-        return $grid;
-        */
         return \Admin::grid(CouponCode::class, function (Grid $grid) {
             $grid->model()->orderBy('created_at','desc');
             $grid->id('ID')->sortable();
@@ -109,26 +90,8 @@ class CouponCodesController extends Controller
             $grid->enabled('Enabled')->display(function ($value) {
                 return $value?'Yes':'No';
             });
-            /*
-            $grid->type('Type')->display(function ($value) {
-                return CouponCode::$typeMap[$value];
-            });
-            $grid->value('Discount')->display(function ($value) {
-                return $this->type === CouponCode::TYPE_FIXED ? '$'.$value : $value.'%';
-            });
-            $grid->min_amount('Minimum Amount');
-            $grid->total('Total');
-            $grid->used('Used');
-            $grid->enabled('Enabled')->display(function($value) {
-                return $value ? 'Yes':'No';
-            });
-            */
+
             $grid->created_at('Created At');
-            /*
-            $grid->actions(function ($actions) {
-                $actions->disableView();
-            });
-            */
         });
     }
 
@@ -166,19 +129,38 @@ class CouponCodesController extends Controller
      */
     protected function form()
     {
-        $form = new Form(new CouponCode);
+        return \Admin::form(CouponCode::class, function (Form $form) {
+            $form->display('id', 'ID');
+            $form->text('name', 'Name')->rules('required');
 
-        $form->text('name', 'Name');
-        $form->text('code', 'Code');
-        $form->text('type', 'Type');
-        $form->decimal('value', 'Value');
-        $form->number('total', 'Total');
-        $form->number('used', 'Used');
-        $form->decimal('min_amount', 'Min amount');
-        $form->datetime('not_before', 'Not before')->default(date('Y-m-d H:i:s'));
-        $form->datetime('not_after', 'Not after')->default(date('Y-m-d H:i:s'));
-        $form->switch('enabled', 'Enabled');
+            //$form->text('code', 'Code')->rules('nullable|unique:coupon_codes');
 
-        return $form;
+            $form->text('code', 'Code')->rules(function($form) {
+              if ($id = $form->model()->id) {
+                return 'nullable|unique:coupon_codes,code,'.$id.',id'; //TODO
+              } else {
+                  return 'nullable|unique:coupon_codes';
+              }
+            });
+
+            $form->radio('type', 'Type')->options(CouponCode::$typeMap)->rules('required');
+            $form->text('value', 'Discount')->rules(function ($form) {
+                if ($form->type === CouponCode::TYPE_PERCENT) {
+                    return 'required|numeric|between:1,99';
+                } else {
+                    return 'required|numeric|min:0.01';
+                }
+            });
+            $form->text('total', 'Total')->rules('required|numeric|min:0');
+            $form->text('min_amount', 'Minimum')->rules('required|numeric|min:0');
+            $form->datetime('not_before', 'Start Since');
+            $form->datetime('not_after', 'End by');
+            $form->radio('enabled', 'Enabled')->options(['1'=>'Y', '0' => 'N']);
+            $form->saving(function (Form $form) {
+                if ( !$form->code ) {
+                  $form->code = CouponCode::findAvailable();
+                }
+            });
+        });
     }
 }

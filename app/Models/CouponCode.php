@@ -54,7 +54,7 @@ class CouponCode extends Model
         }
 
         if($this->type === self::TYPE_PERCENT) {
-            return $str.' get discount by '.str_replace('.00', '', $this->value.'%');
+            return $str.' get discount by e'.str_replace('.00', '', $this->value.'%');
         }
         return $str.' minus '.str_replace('.00', '', $this->value);
     }
