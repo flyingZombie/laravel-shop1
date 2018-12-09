@@ -9,15 +9,21 @@ use App\Models\ProductSku;
 use App\Exceptions\InvalidRequestException;
 use App\Jobs\CloseOrder;
 use Carbon\Carbon;
+use App\Models\CouponCode;
+use App\Exceptions\CouponCodeUnavailableException;
 
 /**
  * 
  */
 class OrderService
 {
-	public function store(User $user, UserAddress $address, $remark, $items)
+	public function store(User $user, UserAddress $address, $remark, $items, CouponCode $coupon = null)
 	{
-		$order = \DB::transaction(function () use ($user, $address, $remark, $items)
+		if ($coupon) {
+		    $coupon->checkAvailable();
+        }
+
+	    $order = \DB::transaction(function () use ($user, $address, $remark, $items, $coupon)
 		{
 			$address->update(['last_used_at' => Carbon::now()]);
 			$order = new Order([
@@ -48,6 +54,16 @@ class OrderService
 					throw new InvalidRequestException('this product is out of stock!');
 				}
 			}
+
+			if ($coupon) {
+			    $coupon->checkAvailable($totalAmount);
+			    $totalAmount = $coupon->getAdjustedPrice($totalAmount);
+			    $order->couponCode()->associate($coupon);
+			    if ($coupon->changeUsed() <= 0) {
+			        throw new CouponCodeUnavailableException('This coupon code has been used up');
+                }
+            }
+
 			$order->update(['total_amount' => $totalAmount]);
 			$skuIds = collect($items)->pluck('sku_id')->all();
 			app(CartService::class)->remove($skuIds);

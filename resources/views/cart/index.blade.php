@@ -153,6 +153,7 @@
         address_id: $('#order-form').find('select[name=address]').val(),
         items: [],
         remark: $('#order-form').find('textarea[name=remark]').val(),
+          coupon_code: $('input[name=coupon_code]').val(),
       };
       $('table tr[data-id]').each(function () {
         var $checkbox = $(this).find('input[name=select][type=checkbox]');
@@ -198,7 +199,7 @@
             swal('Please input coupon code', '', 'warning');
             return;
         }
-        axios.get('/coupon_codes'+encodeURIComponent(code))
+        axios.get('/coupon_codes/'+encodeURIComponent(code))
             .then(function (response) {
                 $('#coupon_desc').text(response.data.description);
                 $('input[name=coupon_code]').prop('readonly', true);
