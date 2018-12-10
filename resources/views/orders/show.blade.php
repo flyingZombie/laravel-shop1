@@ -96,6 +96,13 @@
         </div>
       </div>
       <div class="order-summary text-right">
+		  @if($order->couponCode)
+			<div class="text-primary">
+			  <span>Coupon Info:</span>
+				<div class="value">{{ $order->couponCode->description }}</div>
+			</div>
+		  @endif
+
         <div class="total-amount">
           <span>Order Total Amout：</span>
           <div class="value">${{ $order->total_amount }}</div>

@@ -179,14 +179,16 @@
         });
       }, function (error) {
         if (error.response.status === 422) {
-          var html = '<div>';
-          _.each(error.response.data.errors, function (errors) {
-            _.each(errors, function (error) {
-              html += error+'<br>';
-            })
-          });
-          html += '</div>';
-          swal({content: $(html)[0], icon: 'error'})
+            var html = '<div>';
+            _.each(error.response.data.errors, function (errors) {
+                _.each(errors, function (error) {
+                    html += error + '<br>';
+                })
+            });
+            html += '</div>';
+            swal({content: $(html)[0], icon: 'error'})
+        } else if(error.response.status === 403) {
+            swal(error.response.data.msg, '', 'error');
         } else {
           swal('System error', '', 'error');
         }
