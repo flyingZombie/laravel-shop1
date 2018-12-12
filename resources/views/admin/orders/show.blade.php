@@ -125,72 +125,74 @@
 	$(document).ready(function () {
       $('#btn-refund-disagree').click(function () {
         swal({
-        	title: 'Please input reason for refusal of refund',
-        	type: 'input',
-        	showCancelButton: true,
-        	closeOnConfirm: false,
-        	confirmButtonText: 'Confirm',
-        	cancelButtonText: 'Cancel',
-        }, function (inputValue) {
-          if (inputValue === false) {
-          	return;
-          }
-          if (!inputValue) {
-          	swal('Reason should not be blank', '', 'error')
-          	return;
-          }
-          $.ajax({
-          	url: '{{ route('admin.orders.handle_refund', [$order->id]) }}',
-          	type: 'POST',
-          	data: JSON.stringify({
-          		agree: false,
-          		reason: inputValue,
-          		_token: LA.token,
-          	}),
-          	contentType: 'application/json',
-          	success: function (data) {
-          	  swal({
+            title: 'Please input reason for refusal of refund',
+            type: 'input',
+            showCancelButton: true,
+            closeOnConfirm: false,
+            confirmButtonText: 'Confirm',
+            cancelButtonText: 'Cancel',
+            preConfirm: function (inputValue) {
+                if (!inputValue) {
+                    swal('Reason can not be black', '', 'error')
+                    return false;
+                }
+                return $.ajax({
+                    url: '{{ route('admin.orders.handle_refund', [$order->id]) }}',
+                    type: 'POST',
+                    data: JSON.stringify({
+                        agree: false,
+                        reason: inputValue,
+                        _token: LA.token,
+                    }),
+                    contentType: 'application/json',
+                });
+            },
+            allowOutsideClick: () => !swal.isLoading()
+        }).then(function(ret) {
+            if(ret.dismiss == 'cancel') {
+                return;
+			}
+			swal({
           	  	title: 'Done',
           	  	type: 'success'
           	  }, function () {
                 location.reload();
-          	  });
-          	}
-
+			});
           });
         });
-      });
 	
       $('#btn-refund-agree').click(function () {
 		  swal({
-			  title: 'Confirm to refund?',
-			  type: 'warning',
-			  showCancelButton: true,
-			  closeOnConfirm: false,
-			  confirmButtonText: 'Confirm',
-			  cancelButtonText: 'Cancel',
-		  }, function (ret) {
-			  if (!ret) {
-			      return;
-			  }
-			  $.ajax({
-				  url: '{{ route('admin.orders.handle_refund', [$order->id]) }}',
-				  type: 'POST',
-				  data: JSON.stringify({
-					  agree: true,
-					  _token: LA.token,
-				  }),
-				  contentType: 'application/json',
-				  success: function (data) {
-					  swal({
-						  title:'Done',
-						  type: 'success'
-					  }, function () {
-						  location.reload();
-                      });
-                  }
-			  });
-          });
-      });
-	});
+              title: 'Confirm to refund?',
+              type: 'warning',
+              showCancelButton: true,
+              closeOnConfirm: false,
+              confirmButtonText: 'Confirm',
+              cancelButtonText: 'Cancel',
+              showLoaderOnConfirm: true,
+              preConfirm: function () {
+                  return $.ajax({
+                      url: '{{ route('admin.orders.handle_refund', [$order->id]) }}',
+                      type: 'POST',
+                      data: JSON.stringify({
+                          agree: true,
+                          _token: LA.token,
+                      }),
+                      contentType: 'application/json',
+                  });
+              }
+          }).then(function(ret) {
+			if (ret.dismiss === 'cancel') {
+			    return;
+            }
+			swal({
+				title: 'Done',
+				type: 'success'
+			}).then(function () {
+				location.reload();
+            });
+			});
+          	});
+		  	});
+
 </script>
