@@ -34,7 +34,7 @@ class Category extends Model
     }
 
     public function products() {
-        return $this->?$this->hasMany(Product::class);
+        return $this->$this->hasMany(Product::class);
     }
 
     public function getPathIdsAttribute() {
