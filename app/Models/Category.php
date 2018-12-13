@@ -42,7 +42,7 @@ class Category extends Model
     }
 
     public function getAncestorsAttribute() {
-        return Category::query()->whereIn('id', $this->path_ids)->orderBy('level')-get();
+        return Category::query()->whereIn('id', $this->path_ids)->orderBy('level')->get();
     }
 
     public function getFullNameAttribute() {

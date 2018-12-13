@@ -1,6 +1,6 @@
 -- MySQL dump 10.13  Distrib 5.7.20, for Linux (x86_64)
 --
--- Host: localhost    Database: laravel-shop1
+-- Host: 127.0.0.1    Database: laravel-shop1
 -- ------------------------------------------------------
 -- Server version	5.7.20-0ubuntu0.16.04.1
 
@@ -21,7 +21,7 @@
 
 LOCK TABLES `admin_menu` WRITE;
 /*!40000 ALTER TABLE `admin_menu` DISABLE KEYS */;
-INSERT INTO `admin_menu` VALUES (1,0,1,'Index','fa-bar-chart','/',NULL,NULL),(2,0,4,'Admin','fa-tasks','',NULL,'2018-10-19 23:29:04'),(3,2,5,'Users','fa-users','auth/users',NULL,'2018-10-19 23:29:04'),(4,2,6,'Roles','fa-user','auth/roles',NULL,'2018-10-19 23:29:04'),(5,2,7,'Permission','fa-ban','auth/permissions',NULL,'2018-10-19 23:29:04'),(6,2,8,'Menu','fa-bars','auth/menu',NULL,'2018-10-19 23:29:04'),(7,2,9,'Operation log','fa-history','auth/logs',NULL,'2018-10-19 23:29:04'),(8,0,2,'User Management','fa-bars','/users','2018-10-11 01:03:08','2018-10-11 01:03:59'),(10,0,3,'Product Manage','fa-cubes','/products','2018-10-20 00:23:53','2018-10-20 00:24:21'),(11,0,0,'Order Management','fa-dollar','/orders','2018-11-25 09:48:04','2018-11-25 09:48:04'),(12,0,0,'Coupon Manage','fa-tags','/coupon_codes','2018-12-07 11:13:25','2018-12-07 11:13:25');
+INSERT INTO `admin_menu` VALUES (1,0,1,'Index','fa-bar-chart','/',NULL,NULL),(2,0,4,'Admin','fa-tasks','',NULL,'2018-10-19 23:29:04'),(3,2,5,'Users','fa-users','auth/users',NULL,'2018-10-19 23:29:04'),(4,2,6,'Roles','fa-user','auth/roles',NULL,'2018-10-19 23:29:04'),(5,2,7,'Permission','fa-ban','auth/permissions',NULL,'2018-10-19 23:29:04'),(6,2,8,'Menu','fa-bars','auth/menu',NULL,'2018-10-19 23:29:04'),(7,2,9,'Operation log','fa-history','auth/logs',NULL,'2018-10-19 23:29:04'),(8,0,2,'User Management','fa-bars','/users','2018-10-11 01:03:08','2018-10-11 01:03:59'),(10,0,3,'Product Manage','fa-cubes','/products','2018-10-20 00:23:53','2018-10-20 00:24:21'),(11,0,0,'Order Management','fa-dollar','/orders','2018-11-25 09:48:04','2018-11-25 09:48:04'),(12,0,0,'Coupon Manage','fa-tags','/coupon_codes','2018-12-07 11:13:25','2018-12-07 11:13:25'),(13,0,0,'Category Manage','fa-bars','/categories','2018-12-13 11:08:07','2018-12-13 11:08:07');
 /*!40000 ALTER TABLE `admin_menu` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -104,4 +104,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2018-12-11 11:49:41
+-- Dump completed on 2018-12-13 11:42:10
