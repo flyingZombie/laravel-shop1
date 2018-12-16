@@ -9,7 +9,25 @@
 
 				<div class="row">
 					<form action=" {{ route('products.index') }}" class="form-inline search-form">
-					
+
+						<a class="all-products" href="{{ route('products.index') }}">All</a> &gt;
+
+						@if ($category)
+
+							@foreach($category->ancestors as $ancestor)
+
+								<span class="category">
+								  <a href="{{ route('products.index',['category_id' => $ancestor->id]) }}">
+									  {{ $ancestor->name }}
+								  </a>
+								</span>
+								<span>></span>
+							@endforeach
+							<span class="category">{{ $category->name }}</span><span> ></span>
+								<input type="hidden" name="category_id" value="{{ $category->id }}">
+
+						@endif
+
 					<input type="text" name="search" class="form-control input-sm" placeholder="Search">
 					<button class="btn btn-primary btn-sm">Search</button>
 					
@@ -23,6 +41,21 @@
 						<option value="rating_asc">Rating from low to high</option>
 					</select>
 					</form>
+				</div>
+
+				<div class="filters">
+					@if ($category && $category->is_directory)
+					  <div class="row">
+						  <div class="col-xs-3 filter-key">Sub-categories</div>
+						  <div class="col-xs-9 filter-values">
+							  @foreach($category->children as $child)
+								<a href="{{ route('products.index', ['category_id' => $child->id]) }}">
+									{{ $child->name }}
+								</a>
+							  @endforeach
+						  </div>
+					  </div>
+					@endif
 				</div>
 
 				<div class="row products-list">

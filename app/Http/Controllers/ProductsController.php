@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Exceptions\InvalidRequestException;
 use App\Models\OrderItem;
+use App\Models\Category;
 
 class ProductsController extends Controller
 {
@@ -27,6 +28,16 @@ class ProductsController extends Controller
     		});
     	}
 
+    	if ($request->input('category_id') && $category = Category::find($request->input('category_id'))) {
+    	    if($category->is_directory) {
+              $builder->whereHas('category', function ($query) use ($category) {
+                  $query->where('path', 'like', $category->path.$category->id.'-%');
+              });
+            } else {
+    	        $builder->where('category_id', $category->id);
+            }
+        }
+
     	if ($order = $request->input('order', '')) {
     		if (preg_match('/^(.+)_(asc|desc)$/', $order, $m)) {
     			if (in_array($m[1], ['price', 'sold_count', 'rating'])) {
@@ -43,6 +54,7 @@ class ProductsController extends Controller
     			'search' => $search,
     			'order' => $order,
     		],
+            'category' => $category ?? null,
     		]);
     }
 
