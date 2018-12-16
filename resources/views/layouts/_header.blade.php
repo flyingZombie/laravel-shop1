@@ -13,6 +13,16 @@
 		</div>
 		<div class="collapse navbar-collapse" id="app-navbar-collapse">
 			<ul class="nav navbar-nav">
+				@if(isset($categoryTree))
+					<li>
+						<a href="#" class="dropdown-toggle" data-toggle="dropdown">
+						  All Categories <b class="caret"></b>
+						</a>
+						<ul class="dropdown-menu multi-level">
+						  @each('layouts._category_item', $categoryTree, 'category')
+						</ul>
+					</li>
+				@endif
 			</ul>
 			<ul class="nav navbar-nav navbar-right">
 				@guest
