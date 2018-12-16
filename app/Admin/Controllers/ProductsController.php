@@ -10,6 +10,8 @@ use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
 use App\Http\Controllers\Controller;
 use Encore\Admin\Controllers\ModelForm;
+use App\Models\Category;
+
 
 class ProductsController extends Controller
 {
@@ -69,8 +71,10 @@ class ProductsController extends Controller
     protected function grid()
     {
         return Admin::grid(Product::class, function (Grid $grid) {
+            $grid->model()->with(['category']);
             $grid->id('ID')->sortable();
             $grid->title('Product Name');
+            $grid->column('category.name', 'Categories');
             $grid->on_sale('On Sale')->display(function ($value) {
                 return $value ? 'Yes' : 'No';
             });
@@ -101,6 +105,13 @@ class ProductsController extends Controller
         return Admin::form(Product::class, function (Form $form) {
 
             $form->text('title', 'Name')->rules('required');
+
+            $form->select('category_id', 'Categories')->options(function($id) {
+                $category = Category::find($id);
+                if ($category) {
+                    return [$category->id => $category->full_name ];
+                }
+            })->ajax('/admin/api/categories?is_directory=0');
 
             $form->image('image', 'Image')->rules('required|image');
 
