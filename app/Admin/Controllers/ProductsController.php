@@ -71,7 +71,7 @@ class ProductsController extends Controller
     protected function grid()
     {
         return Admin::grid(Product::class, function (Grid $grid) {
-            $grid->model()->with(['category']);
+            $grid->model()->where('type', Product::TYPE_NORMAL)->with(['category']);
             $grid->id('ID')->sortable();
             $grid->title('Product Name');
             $grid->column('category.name', 'Categories');
@@ -103,6 +103,8 @@ class ProductsController extends Controller
     protected function form()
     {
         return Admin::form(Product::class, function (Form $form) {
+
+            $form->hidden('type')->value(Product::TYPE_NORMAL);
 
             $form->text('title', 'Name')->rules('required');
 
