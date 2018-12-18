@@ -13,54 +13,31 @@ use Encore\Admin\Controllers\ModelForm;
 use App\Models\Category;
 
 
-class ProductsController extends Controller
+class ProductsController extends CommonProductsController
 {
-    use ModelForm;
-
-    /**
-     * Index interface.
-     *
-     * @return Content
-     */
-    public function index()
+    public function getProductType()
     {
-        return Admin::content(function (Content $content) {
-
-            $content->header('Products List');
-
-            $content->body($this->grid());
-        });
+        return Product::TYPE_NORMAL;
     }
 
-    /**
-     * Edit interface.
-     *
-     * @param $id
-     * @return Content
-     */
-    public function edit($id)
+    protected function customGrid(Grid $grid)
     {
-        return Admin::content(function (Content $content) use ($id) {
-
-            $content->header('Editing Product');
-
-            $content->body($this->form()->edit($id));
+        $grid->model()->with(['category']);
+        $grid->id('ID')->sortable();
+        $grid->title('Product Name');
+        $grid->column('category.name', 'Categories');
+        $grid->on_sale('On Sale')->display(function ($value) {
+            return $value ? 'Yes' : 'No';
         });
+        $grid->price('Price');
+        $grid->rating('Rating');
+        $grid->sold_count('Sold Count');
+        $grid->review_count('Review Count');
     }
 
-    /**
-     * Create interface.
-     *
-     * @return Content
-     */
-    public function create()
+    protected function customForm(Form $form)
     {
-        return Admin::content(function (Content $content) {
 
-            $content->header('Create Product');
-
-            $content->body($this->form());
-        });
     }
 
     /**
