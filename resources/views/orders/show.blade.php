@@ -46,7 +46,7 @@
       <div class="order-info">
         <div class="line">
         	<div class="line-label">Receiving Address: </div>
-        	<div class="line-value">{{ join(' ', $order->address) }}</div>
+        	<div class="line-value">{{ join(" ", $order->address) }}</div>
         </div>
         <div class="line">
         	<div class="line-label">Order Remark:</div>

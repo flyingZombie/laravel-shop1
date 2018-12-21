@@ -12,12 +12,61 @@
       </div>
       <div class="col-sm-7">
         <div class="title">{{ $product->title }}</div>
+
+        @if($product->type === \App\Models\Product::TYPE_CROWDFUNDING)
+
+          <div class="crowdfunding-info">
+            <div class="have-text">
+              Enough funded!
+            </div>
+            <div class="total-amount">
+              <span class="symbol">
+                $
+              </span>
+              {{ $product->crowdfunding->total_amount }}
+            </div>
+            <div class="progress">
+              <div class="progress-bar progress-bar-success progress-bar-striped"
+                role="progressbar"
+                aria-valuenow="{{ $product->crowdfunding->percent }}"
+                  aria-valuemin="0"
+                   aria-valuemax="100"
+                   style="min-width: 1em; width: {{ min($product->crowdfunding->percent, 100 ) }}%">
+              </div>
+            </div>
+            <div class="progress-info">
+              <span class="current-progress">
+                Current progress: {{ $product->crowdfunding->percent }}%
+              </span>
+              <span class="pull-right user-count">
+                {{ $product->crowdfunding->user_count }} Supporters
+              </span>
+            </div>
+
+            @if ($product->crowdfunding->status === \App\Models\CrowdfundingProduct::STATUS_FUNDING)
+
+              <div>This project must get
+                <span class="text-red"> $
+                  {{ $product->crowdfunding->target_amount }}
+                </span> before
+                <span class="text-red">
+                  {{ $product->crowdfunding->end_at->format('Y-m-d H:i:s') }}
+                </span>
+                The funding will be ended by <span class="text-red">{{ $product->crowdfunding->end_at->diffForHumans(now()) }}</span>
+              </div>
+            @endif
+          </div>
+          @else
+
         <div class="price"><label>Price</label><em>$</em><span>{{ $product->price }}</span></div>
         <div class="sales_and_reviews">
           <div class="sold_count">Sold count <span class="count">{{ $product->sold_count }}</span></div>
           <div class="review_count">Review count <span class="count">{{ $product->review_count }}</span></div>
           <div class="rating" title="Rating {{ $product->rating }}">Rating <span class="count">{{ str_repeat('★', floor($product->rating)) }}{{ str_repeat('☆', 5 - floor($product->rating)) }}</span></div>
         </div>
+      </div>
+      @endif
+
         <div class="skus">
           <label>Choose</label>
           <div class="btn-group" data-toggle="buttons">
@@ -41,7 +90,24 @@
           @else 
           <button class="btn btn-success btn-favor">❤ Add favor</button>
           @endif
-          <button class="btn btn-primary btn-add-to-cart">Add to shopping cart</button>
+
+          @if($product->type === \App\Models\Product::TYPE_CROWDFUNDING)
+            @if(Auth::check())
+              @if($product->crowdfunding->status === \App\Models\CrowdfundingProduct::STATUS_FUNDING)
+                <button class="btn btn-primary btn-crowdfunding">Join</button>
+              @else
+                <button class="btn btn-primary disabled">
+                {{ \App\Models\CrowdfundingProduct::$statusMap[$product->crowdfunding->status] }}
+                </button>
+              @endif
+              @else
+                <a class="btn btn-primary" href="{{ route('login') }}">
+                  Please log in first
+                </a>
+              @endif
+            @else
+              <button class="btn btn-primary btn-add-to-cart">Add to shopping cart</button>
+            @endif
         </div>
       </div>
     </div>
@@ -156,7 +222,75 @@
         }
       })
     });
-  });
 
+    $('.btn-crowdfunding').click(function () {
+
+        if (!$('label.active input[name=skus]').val()) {
+            swal('Please select product first');
+            return;
+        }
+
+        var addresses = {!! json_encode(Auth::check() ? Auth::user()->addresses : []) !!};
+
+        var $form = $('<form class="form-horizontal" role="form"></form>');
+
+        $form.append('<div class="form-group">' +
+            '<label class="control-label col-sm-3">Select Address</label>' +
+            '<div class="col-sm-9">' +
+            '<select class="form-control" name="address_id"></select>' +
+            '</div></div>');
+        addresses.forEach(function (address) {
+            $form.find('select[name=address_id]')
+                .append("<option value='" + address.id + "'>" +
+                    address.full_address + ' ' + address.contact_name + ' ' + address.contact_phone +
+                    '</option>');
+        });
+        $form.append('<div class="form-group">' +
+            '<label class="control-label col-sm-3">Amount</label>' +
+            '<div class="col-sm-9"><input class="form-control" name="amount">' +
+            '</div></div>');
+
+        swal({
+            text: 'Join',
+            content: $form[0],
+            buttons: ['Cancel', 'Yes']
+        }).then(function (ret) {
+
+            if (!ret) {
+                return;
+            }
+
+            var req = {
+                address_id: $form.find('select[name=address_id]').val(),
+                amount: $form.find('input[name=amount]').val(),
+                sku_id: $('label.active input[name=skus]').val()
+            };
+            axios.post('{{ route('crowdfunding_orders.store') }}', req)
+                .then(function (response) {
+
+                    swal('Submitted', '', 'success')
+                        .then(() => {
+                            location.href = '/orders/' + response.data.id;
+                        });
+                }, function (error) {
+                    if (error.response.status === 422) {
+                        var html = '<div>';
+                        _.each(error.response.data.errors, function (errors) {
+                            _.each(errors, function (error) {
+                                html += error+'<br>';
+                            })
+                        });
+                        html += '</div>';
+                        swal({content: $(html)[0], icon: 'error'})
+                    } else if (error.response.status === 403) {
+                        swal(error.response.data.msg, '', 'error');
+                    } else {
+                        swal('System error', '', 'error');
+                    }
+                });
+        });
+    });
+
+  });
 </script>
 @endsection
