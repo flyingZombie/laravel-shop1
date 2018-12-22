@@ -9,6 +9,7 @@ use App\Models\Order;
 use Carbon\Carbon;
 use App\Exceptions\InvalidRequestException;
 use App\Jobs\CloseOrder;
+use http\Exception\InvalidArgumentException;
 use Illuminate\Http\Request;
 use App\Services\CartService;
 use App\Services\OrderService;
@@ -118,6 +119,10 @@ class OrdersController extends Controller
 		if (!$order->paid_at) {
 			throw new InvalidRequestException('This order is not paid yet, no refund.');
 		}
+
+		if ($order->type === Order::TYPE_CROWDFUNDING) {
+		    throw new InvalidArgumentException('The crowd-funding order doesn\'t support refund');
+        }
 
 		if ($order->refund_status !== Order::REFUND_STATUS_PENDING) {
 			throw new InvalidRequestException('This order already got refunded. please don\'t apply refund.');

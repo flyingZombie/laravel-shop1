@@ -146,7 +146,8 @@
 		  </div>
 		@endif
 
-		@if($order->paid_at && $order->refund_status === \App\Models\Order::REFUND_STATUS_PENDING)
+		@if($order->type !== \App\Models\Order::TYPE_CROWDFUNDING &&
+			$order->paid_at && $order->refund_status === \App\Models\Order::REFUND_STATUS_PENDING)
 			<div class="refund_button">
 				<button class="btn btn-sm btn-danger" id="btn-apply-refund">Apply for refund</button>
 			</div>

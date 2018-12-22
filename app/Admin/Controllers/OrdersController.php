@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use App\Models\CrowdfundingProduct;
 use App\Models\Order;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
@@ -145,6 +146,11 @@ class OrdersController extends Controller
 
         if ($order->ship_status !== Order::SHIP_STATUS_PENDING) {
             throw new InvalidRequestException('This order has been delivered already!');
+        }
+
+        if ($order->type === Order::TYPE_CROWDFUNDING &&
+            $order->items[0]->product->crowdfunding->status !== CrowdfundingProduct::STATUS_SUCCESS){
+            throw new InvalidRequestException('crowd-funding products can only be shipped after the funding is successful');
         }
         
         $data = $this->validate($request, [

@@ -31,7 +31,16 @@ class Order extends Model
 		self::SHIP_STATUS_RECEIVED => 'SHIP RECEIVED',
 	];
 
+	const TYPE_NORMAL = 'normal';
+	const TYPE_CROWDFUNDING = 'crowdfunding';
+
+	public static $typeMap = [
+        self::TYPE_NORMAL => 'normal product order',
+        self::TYPE_CROWDFUNDING => 'crowd-funding product order',
+    ];
+
 	protected $fillable = [
+	    'type',
         'no',
         'address',
         'total_amount',
