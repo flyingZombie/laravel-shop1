@@ -208,7 +208,8 @@ class OrdersController extends Controller
                     'refund_fee' => $order->total_amount * 100,
                     'out_refund_no' => $refundNo,
                     //'notify_url' => 'http://requestbin.leo108.com/1ewu0zq1'
-                    'notify_url' => route('payment.wechat.refund_notify'),
+                    //'notify_url' => route('payment.wechat.refund_notify'),
+                    'notify_url' => ngrok_url('payment.wechat.refund_notify'),
                 ]);
 
                 $order->update([
