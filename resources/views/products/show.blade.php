@@ -17,7 +17,7 @@
 
           <div class="crowdfunding-info">
             <div class="have-text">
-              Enough funded!
+              Already got
             </div>
             <div class="total-amount">
               <span class="symbol">
@@ -29,8 +29,7 @@
               <div class="progress-bar progress-bar-success progress-bar-striped"
                 role="progressbar"
                 aria-valuenow="{{ $product->crowdfunding->percent }}"
-                  aria-valuemin="0"
-                   aria-valuemax="100"
+                  aria-valuemin="0" aria-valuemax="100"
                    style="min-width: 1em; width: {{ min($product->crowdfunding->percent, 100 ) }}%">
               </div>
             </div>
