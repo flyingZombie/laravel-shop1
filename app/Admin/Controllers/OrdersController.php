@@ -14,6 +14,7 @@ use Illuminate\Http\Request;
 use App\Exceptions\InvalidRequestException;
 use App\Http\Requests\Admin\HandleRefundRequest;
 use App\Exceptions\InternalException;
+use App\Services\OrderService;
 
 class OrdersController extends Controller
 {
@@ -169,7 +170,7 @@ class OrdersController extends Controller
         return redirect()->back();
     }
 
-    public function handleRefund(Order $order, HandleRefundRequest $request)
+    public function handleRefund(Order $order, HandleRefundRequest $request, OrderService $orderService)
     {
         if ($order->refund_status !== Order::REFUND_STATUS_APPLIED) {
             throw new InvalidRequestException('The status of order is not right!');
@@ -182,7 +183,8 @@ class OrdersController extends Controller
             $order->update([
                 'extra' => $extra,
             ]);
-            $this->_refundOrder($order);
+            //$this->_refundOrder($order);
+            $orderService->refundOrder($order);
 
         } else {
             $extra = $order->extra ?: [];
@@ -194,7 +196,7 @@ class OrdersController extends Controller
         }
         return $order;
     }
-
+    /**
     protected function _refundOrder(Order $order) {
 
         switch ($order->payment_method) {
@@ -249,5 +251,5 @@ class OrdersController extends Controller
                 break;
         }
     }
-
+*/
 }

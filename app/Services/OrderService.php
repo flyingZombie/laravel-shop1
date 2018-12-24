@@ -12,13 +12,69 @@ use Carbon\Carbon;
 use App\Models\CouponCode;
 use App\Exceptions\CouponCodeUnavailableException;
 use http\Exception\InvalidArgumentException;
+use App\Exceptions\InternalException;
 
 /**
  * 
  */
 class OrderService
 {
-	public function store(User $user, UserAddress $address, $remark, $items, CouponCode $coupon = null)
+    public function refundOrder(Order $order) {
+
+        switch ($order->payment_method) {
+            case 'wechat':
+
+                $refundNo = Order::getAvailableRefundNo();
+
+                app('wechat_pay')->refund([
+                    'out_trade_no' => $order->no,
+                    'total_fee' => $order->total_amount * 100,
+                    'refund_fee' => $order->total_amount * 100,
+                    'out_refund_no' => $refundNo,
+                    //'notify_url' => 'http://requestbin.leo108.com/1ewu0zq1'
+                    //'notify_url' => route('payment.wechat.refund_notify'),
+                    'notify_url' => ngrok_url('payment.wechat.refund_notify'),
+                ]);
+
+                $order->update([
+                    'refund_no' => $refundNo,
+                    'refund_status' => Order::REFUND_STATUS_PROCESSING,
+                ]);
+
+                break;
+
+            case 'alipay':
+
+                $refundNo = Order::getAvailableRefundNo();
+
+                $ret = app('alipay')->refund([
+                    'out_trade_no' => $order->no,
+                    'refund_amount' => $order->total_amount,
+                    'out_request_no' => $refundNo,
+                ]);
+
+                if ($ret->sub_code) {
+                    $extra = $order->extra;
+                    $extra['refund_failed_code'] = $ret->sub_code;
+                    $order->update([
+                        'refund_no' => $refundNo,
+                        'refund_status' => Order::REFUND_STATUS_FAILED,
+                        'extra' => $extra,
+                    ]);
+                } else {
+                    $order->update([
+                        'refund_no' => $refundNo,
+                        'refund_status' => Order::REFUND_STATUS_SUCCESS,
+                    ]);
+                }
+                break;
+            default:
+                throw new InternalException('Unknown order payment: '.$order->payment_method);
+                break;
+        }
+    }
+
+    public function store(User $user, UserAddress $address, $remark, $items, CouponCode $coupon = null)
 	{
 		if ($coupon) {
 		    $coupon->checkAvailable($user);
@@ -79,8 +135,8 @@ class OrderService
 
 	}
 
-	public function crowdfunding(User $user, UserAddress $address, ProductSku $sku, $amount){
-
+	public function crowdfunding(User $user, UserAddress $address, ProductSku $sku, $amount)
+    {
 	    $order = \DB::transaction(function () use ($amount, $sku, $user, $address) {
 
 	        $address->update(['last_used_at' => Carbon::now()]);
