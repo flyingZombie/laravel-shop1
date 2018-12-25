@@ -68,19 +68,7 @@ class FinishCrowdfunding extends Command
         $crowdfundingProduct->update([
             'status' => CrowdfundingProduct::STATUS_FAIL,
         ]);
-        /*
-        $orderService = app(OrderService::class);
-        Order::query()
-            ->where('type', Order::TYPE_CROWDFUNDING)
-            ->whereNotNull('paid_at')
-            ->whereHas('items', function ($query) use ($crowdfundingProduct) {
-                $query->where('product_id', $crowdfundingProduct->product_id);
-            })
-            ->get()
-            ->each(function (Order $order) use($orderService) {
-                $orderService->refundOrder($order);
-            });
-        */
+
         dispatch(new RefundCrowdfundingOrders($crowdfundingProduct));
     }
 }

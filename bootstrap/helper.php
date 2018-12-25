@@ -12,6 +12,10 @@ function ngrok_url($routeName, $parameters = [])
         // route() 函数第三个参数代表是否绝对路径
         return $url.route($routeName, $parameters, false);
     }
-
     return route($routeName, $parameters);
+}
+
+function big_number($number, $scale=2)
+{
+    return new \Moontoast\Math\BigNumber($number, $scale);
 }

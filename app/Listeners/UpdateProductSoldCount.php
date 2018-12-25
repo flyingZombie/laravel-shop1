@@ -30,7 +30,7 @@ class UpdateProductSoldCount implements ShouldQueue
                     $query->whereNotNull('paid_at');
                 })->sum('amount');
         }
-        $proudct->update([
+        $product->update([
             'sold_count' => $soldCount,
         ]);
     }
