@@ -16,7 +16,7 @@ class Installment extends Model
         self::STATUS_FINISHED => 'Finished',
     ];
 
-    protected $fillable = ['no', 'total_amount','count', 'fee_rate', 'find_rate', 'status'];
+    protected $fillable = ['no', 'total_amount','count', 'fee_rate', 'fine_rate', 'status'];
 
     protected static function boot()
     {

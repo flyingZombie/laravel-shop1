@@ -23,7 +23,7 @@ class CreateInstallmentsTable extends Migration
             $table->decimal('total_amount');
             $table->unsignedInteger('count');
             $table->float('fee_rate');
-            $table->float('find_rate');
+            $table->float('fine_rate');
             $table->string('status')->default(\App\Models\Installment::STATUS_PENDING);
             $table->timestamps();
         });

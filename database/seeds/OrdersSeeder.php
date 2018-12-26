@@ -27,8 +27,9 @@ class OrdersSeeder extends Seeder
             $total = $items->sum(function (OrderItem $item) {
                 return $item->price * $item->amount;
             });
+
             if ($order->couponCode) {
-                $total = $total->couponCode->getAdjustedPrice($total);
+                $total = $order->couponCode->getAdjustedPrice($total);
             }
             $order->update([
                 'total_amount' => $total,

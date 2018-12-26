@@ -137,6 +137,11 @@
 		<div class="payment-buttons">
 		<a class="btn btn-primary btn-sm" href="{{ route('payment.alipay',['order' => $order->id]) }}">Pay via Alipay</a>
 	    <a class="btn btn-primary btn-sm" id = 'btn-wechat'>Pay via Weichat</a>
+			@if ($order->total_amount >= config('app.min_installment_amount'))
+			<button class="btn btn-sm btn-info" id='btn-installment'>
+			  By installments
+			</button>
+				@endif
 		</div>
 		@endif
 
@@ -159,6 +164,45 @@
 </div>
 </div>
 </div>
+
+	<div class="modal fade" id="installment-modal">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal">
+						<span aria-hidden="true">x</span>
+					</button>
+					<h4>Select timing for installments </h4>
+				</div>
+				<div class="modal-body">
+					<table class="table table-bordered table-striped text-center">
+						<thead>
+						<tr>
+							<th class="text-center">Periods</th>
+							<th class="text-center">Rates</th>
+						</tr>
+						</thead>
+							<tbody>
+							@foreach(config('app.installment_fee_rate') as $count => $rate)
+								<tr>
+									<td>Period {{ $count }}</td>
+									<td>{{ $rate }}%</td>
+									<td>
+										<button class="btn btn-sm btn-primary btn-select-installment" data-count="{{ $count }}">Select</button>
+									</td>
+								</tr>
+								@endforeach
+							</tbody>
+					</table>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
 @endsection
 
 @section('scriptsAfterJs')
@@ -213,6 +257,17 @@
 				  });
 			});
 		});
+
+		$('#btn-installment').click(function () {
+		    $('#installment-modal').modal();
+		});
+
+		$('.btn-select-installment').click(function () {
+			axios.post('{{ route('payment.installment', ['order' => $order->id ]) }}', { count: $(this).data('count')})
+				.then(function (response) {
+					console.log(response.data);
+                })
+        });
 	});
 </script>
 @endsection
