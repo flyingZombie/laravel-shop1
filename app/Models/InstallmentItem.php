@@ -55,6 +55,6 @@ class InstallmentItem extends Model
 
     public function getIsOverDueAttribute()
     {
-        return Carbon::now()->get($this->due_date);
+        return Carbon::now()->gt($this->due_date);
     }
 }
