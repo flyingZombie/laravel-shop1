@@ -30,7 +30,7 @@
                             <td>{{ $installment->fee_rate }}%</td>
                             <td>{{ \App\Models\Installment::$statusMap[$installment->status] }}</td>
                             <td><a class="btn btn-primary btn-xs"
-                                   href="{{ route('$installment.show', ['$installment' => $installment->id]) }}">View
+                                   href="{{ route('installments.show', ['$installment' => $installment->id]) }}">View
                                 </a>
                             </td>
                         </tr>

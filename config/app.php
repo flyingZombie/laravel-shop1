@@ -252,6 +252,4 @@ return [
     ],
     'min_installment_amount' => 300,
     'installment_fine_rate' => 0.05,
-
-
 ];

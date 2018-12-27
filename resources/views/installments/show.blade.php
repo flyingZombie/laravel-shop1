@@ -19,11 +19,11 @@
                             </div>
                             <div class="line">
                                 <div class="line-label">Amount：</div>
-                                <div class="line-value">￥{{ $installment->total_amount }}</div>
+                                <div class="line-value">${{ $installment->total_amount }}</div>
                             </div>
                             <div class="line">
                                 <div class="line-label">Period：</div>
-                                <div class="line-value">{{ $installment->count }}期</div>
+                                <div class="line-value">Period {{ $installment->count }}</div>
                             </div>
                             <div class="line">
                                 <div class="line-label">Rate：</div>
@@ -45,14 +45,15 @@
                             @else
                                 <div>
                                     <span>To pay：</span>
-                                    <div class="value total-amount">￥{{ $nextItem->total }}</div>
+                                    <div class="value total-amount">${{ $nextItem->total }}</div>
                                 </div>
                                 <div>
                                     <span>Due by：</span>
                                     <div class="value">{{ $nextItem->due_date->format('Y-m-d') }}</div>
                                 </div>
                                 <div class="payment-buttons">
-                                    <a class="btn btn-primary btn-sm" href="">Alipay</a>
+                                    <a class="btn btn-primary btn-sm"
+                                       href="{{ route('installments.alipay', ['installment' => $installment->id]) }}">Alipay</a>
                                     <button class="btn btn-sm btn-success" id='btn-wechat'>Wechat</button>
                                 </div>
                             @endif
@@ -86,13 +87,13 @@
                                             <span class="needs-repay">To pay</span>
                                         @endif
                                     @else
-                                        <span class="repaid">已还款</span>
+                                        <span class="repaid">Paid</span>
                                     @endif
                                 </td>
                                 <td>${{ $item->base }}</td>
                                 <td>${{ $item->fee }}</td>
                                 <td>{{ is_null($item->fine) ? 'No' : ('$'.$item->fine) }}</td>
-                                <td class="text-right">￥{{ $item->total }}</td>
+                                <td class="text-right">${{ $item->total }}</td>
                             </tr>
                         @endforeach
                         <tr><td colspan="7"></td></tr>
