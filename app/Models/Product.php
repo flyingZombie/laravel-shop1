@@ -45,4 +45,18 @@ class Product extends Model
     public function crowdfunding() {
         return $this->hasOne(CrowdfundingProduct::class);
     }
+
+    public function properties()
+    {
+        return $this->hasMany(ProductProperty::class);
+    }
+
+    public function getGroupedPropertiesAttribute()
+    {
+        return $this->properties
+                    ->groupBy('name')
+                    ->map(function ($propertis) {
+                        return $propertis->pluck('value')->all();
+                    });
+    }
 }

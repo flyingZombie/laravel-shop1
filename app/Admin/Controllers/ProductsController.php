@@ -45,6 +45,7 @@ class ProductsController extends CommonProductsController
      *
      * @return Grid
      */
+    /*
     protected function grid()
     {
         return Admin::grid(Product::class, function (Grid $grid) {
@@ -71,12 +72,13 @@ class ProductsController extends CommonProductsController
             });
         });
     }
-
+    */
     /**
      * Make a form builder.
      *
      * @return Form
      */
+    /*
     protected function form()
     {
         return Admin::form(Product::class, function (Form $form) {
@@ -109,6 +111,6 @@ class ProductsController extends CommonProductsController
                 $form->model()->price = collect($form->input('skus'))->where(Form::REMOVE_FLAG_NAME, 0)->min('price') ?: 0;
             });
         });
-
     }
+    */
 }

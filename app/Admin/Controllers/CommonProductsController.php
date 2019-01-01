@@ -83,15 +83,21 @@ abstract class CommonProductsController extends Controller
       $form->text('crowdfunding.target_amount','Target Amount')->rules('required|numeric|min:0.01');
 
       $form->datetime('crowdfunding.end_at', 'End at')->rules('required|date');
-        */
-        $this->customForm($form);
+        */$this->customForm($form);
 
-      $form->hasMany('skus', function (Form\NestedForm $form) {
+
+      $form->hasMany('skus', 'Product Skus' ,function (Form\NestedForm $form) {
           $form->text('title', 'SKU name')->rules('required');
           $form->text('description', 'SKU desc')->rules('required');
           $form->text('price', 'Price')->rules('required|numeric|min:0.01');
           $form->text('stock', 'In Stock')->rules('required|integer|min:0');
       });
+
+      $form->hasMany('properties','Product properties' ,function (Form\NestedForm $form) {
+          $form->text('name', 'Property name')->rules('required');
+          $form->text('value', 'Property value')->rules('required');
+      });
+
 
       $form->saving(function (Form $form) {
           $form->model()->price = collect($form->input('skus'))->where(Form::REMOVE_FLAG_NAME, 0)->min('price');
