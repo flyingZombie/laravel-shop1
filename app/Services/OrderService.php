@@ -13,7 +13,7 @@ use App\Models\CouponCode;
 use App\Exceptions\CouponCodeUnavailableException;
 use http\Exception\InvalidArgumentException;
 use App\Exceptions\InternalException;
-
+use App\Jobs\RefundInstallmentOrder;
 /**
  * 
  */
@@ -68,6 +68,18 @@ class OrderService
                     ]);
                 }
                 break;
+
+            case 'installment':
+
+                $order->update([
+                  'refund_no' => Order::getAvailableRefundNo(),
+                    'refund_status' => Order::REFUND_STATUS_PROCESSING,
+                ]);
+
+                dispatch(new RefundInstallmentOrder($order));
+
+                break;
+
             default:
                 throw new InternalException('Unknown order payment: '.$order->payment_method);
                 break;

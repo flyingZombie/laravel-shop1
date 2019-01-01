@@ -3,12 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Policies\InstallmentPolicy;
-use function foo\func;
 use Illuminate\Http\Request;
 use App\Models\Installment;
 use App\Exceptions\InvalidRequestException;
 use App\Events\OrderPaid;
 use Carbon\Carbon;
+use App\Models\InstallmentItem;
+use App\Models\Order;
 
 
 class InstallmentsController extends Controller
@@ -55,7 +56,8 @@ class InstallmentsController extends Controller
         ]);
     }
 
-    public function alipayReturn() {
+    public function alipayReturn()
+    {
 
         try {
             app('alipay')->verify();
@@ -112,5 +114,56 @@ class InstallmentsController extends Controller
         }
       });
         return app('alipay')->success();
+    }
+
+    public function wechatRefundNotify(Request $request)
+    {
+        $failXml = '<xml><return_code><![CDATA[FAIL]]></return_code><return_msg><![CDATA[FAIL]]></return_msg></xml>';
+
+        $data = app('wechat_pay')->verify(null, true);
+
+        list($no, $sequence) = explode('_', $data['out_refund_no']);
+
+        $item = InstallmentItem::query()
+                ->whereHas('installment', function ($query) use ($no) {
+                    $query->whereHas('order', function($query) use ($no) {
+                        $query->where('refund_no', $no);
+                    });
+                })->where('sequence', $sequence)
+            ->first();
+
+        if (!$item) {
+            return $failXml;
+        }
+
+        if ($data['refund_status'] === 'SUCCESS') {
+
+            $item->update([
+                'refund_status' => InstallmentItem::REFUND_STATUS_SUCCESS,
+            ]);
+            $item->installment->refreshRefundStatus();
+            /*
+            $allSuccess = true;
+
+            foreach ($item->installment->items as $item) {
+                if ($item->paid_at && $item->refund_status !== InstallmentItem::REFUND_STATUS_SUCCESS) {
+                    $allSuccess = false;
+                    break;
+                }
+            }
+
+            if ($allSuccess) {
+                $item->installment->order->update([
+                    'refund_status' => Order::REFUND_STATUS_SUCCESS,
+                ]);
+            }
+            */
+        } else {
+            $item->update([
+              'refund_status' => InstallmentItem::REFUND_STATUS_FAILED,
+            ]);
+        }
+
+        return app('wechat_pay')->success();
     }
 }
