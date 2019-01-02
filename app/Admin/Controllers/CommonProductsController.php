@@ -9,6 +9,7 @@ use Encore\Admin\Layout\Content;
 use Encore\Admin\Grid;
 use Encore\Admin\Form;
 use App\Models\Category;
+use App\Jobs\SyncOneProductToES;
 
 abstract class CommonProductsController extends Controller
 {
@@ -105,6 +106,10 @@ abstract class CommonProductsController extends Controller
           $form->model()->price = collect($form->input('skus'))->where(Form::REMOVE_FLAG_NAME, 0)->min('price');
       });
 
+      $form->saved(function (Form $form) {
+          $product = $form->model();
+          $this->dispatch(new SyncOneProductToES($product));
+      });
       return $form;
   }
 }
