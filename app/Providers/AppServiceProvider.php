@@ -7,6 +7,7 @@ use App\Models\UserAddress;
 use App\Policies\UserAddressPolicy;
 use Monolog\Logger;
 use Yansongda\Pay\Pay;
+use Elasticsearch\ClientBuilder as ESClientBuilder;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -59,6 +60,17 @@ class AppServiceProvider extends ServiceProvider
                 $config['log']['level'] = Logger::WARNING;
             }
             return Pay::wechat($config);
+        });
+
+        $this->app->singleton('es', function () {
+          $builder = ESClientBuilder::create()->setHosts(config('database.elasticsearch.hosts'));
+
+          if (app()->environment() === 'local') {
+              $builder->setLogger(app('log')->getMonolog());
+          }
+
+          return $builder->build();
+
         });
         
     }
