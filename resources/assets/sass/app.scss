@@ -122,13 +122,16 @@ body {
   }
 
   .search-form {
+
     padding: 0 20px 10px;
     border-bottom: 1px solid #eee;
+
     .all-products {
       font-size: 12px;
       color: #666;
       text-decoration: none;
     }
+
     .category {
       font-size: 12px;
       height: 22px;
@@ -140,6 +143,25 @@ body {
         color: #666;
       }
     }
+
+    .filter {
+      border: 1px red solid;
+      font-size: 12px;
+      padding: 2px 0 2px 2px;
+
+      .filter-value {
+        color: red;
+      }
+
+      .remove-filter {
+        text-decoration: none;
+        color: white;
+        font-weight: bold;
+        background: red;
+        padding: 2px;
+      }
+    }
+
   }
 
   .filters {

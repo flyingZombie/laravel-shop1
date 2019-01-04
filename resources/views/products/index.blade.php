@@ -10,6 +10,8 @@
 				<div class="row">
 					<form action=" {{ route('products.index') }}" class="form-inline search-form">
 
+						<input type="hidden" name="filters">
+
 						<a class="all-products" href="{{ route('products.index') }}">All</a> &gt;
 
 						@if ($category)
@@ -25,8 +27,14 @@
 							@endforeach
 							<span class="category">{{ $category->name }}</span><span> ></span>
 								<input type="hidden" name="category_id" value="{{ $category->id }}">
-
 						@endif
+
+						@foreach($propertyFilters as $name => $value)
+						  <span class="filter">{{ $name }}:
+							<span class="filter-value">{{ $value }}</span>
+							  <a class="remove-filter" href="javascript: removeFilterFromQuery('{{$name}}')">x</a>
+						  </span>
+						@endforeach
 
 					<input type="text" name="search" class="form-control input-sm" placeholder="Search">
 					<button class="btn btn-primary btn-sm">Search</button>
@@ -56,6 +64,20 @@
 						  </div>
 					  </div>
 					@endif
+
+					@foreach($properties as $property)
+
+						<div class="row">
+						  <div class="col-xs-3 filter-key">
+							{{ $property['key'] }}:
+						  </div>
+							<div class="col-xs-9 filter-values">
+								@foreach($property['values'] as $value)
+									<a href="javascript: appendFilterToQuery('{{ $property['key'] }}', '{{ $value }}')">{{ $value }}</a>
+								@endforeach
+							</div>
+						</div>
+						@endforeach
 				</div>
 
 				<div class="row products-list">
@@ -100,14 +122,69 @@
 
 @section('scriptsAfterJs')
 <script>
+
   var filters = {!! json_encode($filters) !!};
+
   $(document).ready(function () {
+
   	$('.search-form input[name=search]').val(filters.search);
   	$('.search-form select[name=order]').val(filters.order);
 
   	$('.search-form select[name=order]').on('change', function() {
+
+  	    var searches = parseSearch();
+
+  	    if (searches['filters']){
+  	        $('.search-form input[name=filters]').val(searches['filters']);
+		}
+
   		$('.search-form').submit();
   	})
   })
+
+	function parseSearch() {
+      var searches = {};
+      location.search.substr(1).split('&').forEach(function (str) {
+          var result = str.split('=');
+          searches[decodeURIComponent(result[0])] = decodeURIComponent(result[1]);
+	  });
+      return searches;
+	}
+
+	function buildSearch(searches) {
+		var query = '?';
+		_.forEach(searches, function (value, key) {
+		    query += encodeURIComponent(key) + '=' + encodeURIComponent(value) + '&';
+		});
+		return query.substr(0, query.length - 1);
+    }
+
+    function appendFilterToQuery(name, value) {
+      var searches = parseSearch();
+      if (searches['filters']) {
+          searches['filters'] += '|' + name + ':' +value;
+	  } else {
+          searches['filters'] = name + ':' +value;
+	  }
+      location.search = buildSearch(searches);
+	}
+
+	function removeFilterFromQuery(name) {
+
+      var searches = parseSearch();
+      if (!searches['fiters']) {
+          return;
+	  }
+      var filters = [];
+      searches['filters'].split('|').forEach(function (filter) {
+		  var result = filter.split(':');
+		  if (result[0] === name) {
+		      return;
+		  }
+		  filters.push(filter);
+      });
+      searches['filters'] = filters.join('|');
+      location.search = buildSearch(searches);
+    }
 </script>
 @endsection
