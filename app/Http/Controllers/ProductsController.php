@@ -8,6 +8,7 @@ use App\Models\OrderItem;
 use App\Models\Category;
 use Illuminate\Pagination\LengthAwarePaginator;
 use App\SearchBuilders\ProductSearchBuilder;
+use App\Services\ProductService;
 
 class ProductsController extends Controller
 {
@@ -64,10 +65,8 @@ class ProductsController extends Controller
 
         $productIds = collect($result['hits']['hits'])->pluck('_id')->all();
 
-        $products = Product::query()
-            ->whereIn('id', $productIds)
-            ->orderByRaw(sprintf("FIND_IN_SET(id, '%s')", join(',', $productIds)))
-            ->get();
+        $products = Product::query()->byIds($productIds)->get();
+
 
         $pager = new LengthAwarePaginator($products, $result['hits']['total'], $perPage, $page, [
             'path' => route('products.index', false),
@@ -101,7 +100,7 @@ class ProductsController extends Controller
     		]);
     }
 
-    public function show(Product $product, Request $request)
+    public function show(Product $product, Request $request, ProductService $service)
     {
     	if (!$product->on_sale) {
     		throw new InvalidRequestException('This product is not for sale');
@@ -121,7 +120,17 @@ class ProductsController extends Controller
             ->limit(10)
             ->get();
 
-    	return view('products.show', ['product' => $product, 'favored' => $favored, 'reviews' => $reviews ]);
+        $similarProductIds = $service->getSimilarProductIds($product, 4);
+
+        $similarProducts = Product::query()->byIds($similarProductIds)->get();
+
+
+    	return view('products.show', [
+    	    'product' => $product,
+            'favored' => $favored,
+            'reviews' => $reviews,
+            'similar' => $similarProducts,
+            ]);
     }
 
     public function favor(Product $product, Request $request)
