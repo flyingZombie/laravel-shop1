@@ -86,10 +86,8 @@
 							<div class="product-content">
 								<div class="top">
 									<div class="img">
-			
-
 									<a href="{{ route('products.show', ['product' => $product->id]) }}">
-                					  <img src="{{ $product->image_url }}" alt="">
+                					  <img class="img-responsive" src="{{ $product->image_url }}" alt="">
               						</a>
 									</div>
 									<div class="price">

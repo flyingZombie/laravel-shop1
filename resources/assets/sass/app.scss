@@ -60,13 +60,16 @@ body {
   .products-list {
     .products-list {
       padding: 0 15px;
+
       .product-item {
         padding: 0 5px;
         margin-bottom: 10px;
+
         .product-content {
           border: 1px solid #eee;
           .top {
             padding: 5px;
+
             img {
               width: 100%;
             }
@@ -91,6 +94,7 @@ body {
               }
             }
           }
+
           .bottom {
             font-size: 12px;
             display: flex;

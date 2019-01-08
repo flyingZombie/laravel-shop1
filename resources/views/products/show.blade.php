@@ -8,7 +8,7 @@
   <div class="panel-body product-info">
     <div class="row">
       <div class="col-sm-5">
-        <img class="cover" src="{{ $product->image_url }}" alt="">
+        <img class="img-responsive" src="{{ $product->image_url }}" alt="">
       </div>
       <div class="col-sm-7">
         <div class="title">{{ $product->long_title ?: $product->title }}</div>
@@ -174,7 +174,7 @@
                             <div class="top">
                                 <div class="img">
                                     <a href="{{ route('products.show', ['product' => $product->id]) }}">
-                                        <img src="{{ $product->image_url }}" alt="">
+                                        <img class="img-responsive" src="{{ $product->image_url }}" alt="">
                                     </a>
                                 </div>
                                 <div class="price"><b>$</b>{{ $product->price }}</div>
