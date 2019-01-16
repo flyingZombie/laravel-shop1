@@ -9,10 +9,12 @@ class Product extends Model
 {
     const TYPE_NORMAL = 'normal';
     const TYPE_CROWDFUNDING = 'crowdfunding';
+    const TYPE_SECKILL = 'seckill';
 
     public static $typeMap = [
         self::TYPE_NORMAL => 'Normal product',
-        self::TYPE_CROWDFUNDING => 'Crowd funding product'
+        self::TYPE_CROWDFUNDING => 'Crowd funding product',
+        self::TYPE_SECKILL => 'Second kill'
     ];
 
     protected $fillable = [
@@ -23,6 +25,11 @@ class Product extends Model
     protected $casts = [
     	'on_sale' => 'boolean',
     ];
+
+    public function seckill()
+    {
+        return $this->hasOne(SeckillProduct::class);
+    }
 
     public function skus()
     {
