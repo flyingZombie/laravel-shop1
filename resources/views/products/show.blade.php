@@ -104,6 +104,19 @@
                   Please log in first
                 </a>
               @endif
+
+            @elseif($product->type === \App\Models\Product::TYPE_SECKILL)
+              @if(Auth::check())
+                  @if($product->seckill->is_before_start)
+                      <button class="btn btn-primary btn-seckill disabled countdown">Countdown</button>
+                      @elseif($product->seckill->is_after_end)
+                      <button class="btn btn-primary btn-seckill disabled">Sec-kill end</button>
+                      @else
+                      <button class="btn btn-primary btn-seckill">Buy at once</button>
+                      @endif
+              @else
+                <a class="btn btn-primary" href="{{ route('login') }}">Please log in first</a>
+              @endif
             @else
               <button class="btn btn-primary btn-add-to-cart">Add to shopping cart</button>
             @endif
@@ -198,6 +211,9 @@
 @endsection
 
 @section('scriptsAfterJs')
+    @if($product->type == \App\Models\Product::TYPE_SECKILL && $product->seckill->is_before_start)
+        <script src="https://cdn.bootcss.com/moment.js/2.22.1/moment.min.js"></script>
+    @endif
 <script>
   $(document).ready(function () {
 
@@ -331,6 +347,79 @@
         });
     });
 
+    @if($product->type == \App\Models\Product::TYPE_SECKILL && $product->seckill->is_before_start)
+
+      var startTime = moment.unix({{ $product->seckill->start_at->getTimestamp() }});
+      var hdl = setInterval(function () {
+          var now = moment();
+          if (now.isAfter(startTime)) {
+              $('.btn-seckill').removeClass('disabled').removeClass('countdown').text('Buy at once');
+              clearInterval(hdl);
+              return;
+          }
+          var hourDiff = startTime.diff(now, 'hours');
+          var minDiff = startTime.diff(now, 'minutes') % 60;
+          var secDiff = startTime.diff(now, 'seconds') % 60;
+
+          $('.btn-seckill').text('Count down : '+hourDiff+':'+minDiff+':'+secDiff);
+      }, 500);
+      @endif
+
+      $('.btn-seckill').click(function () {
+
+          if($(this).hasClass('disabled')) {
+              return;
+          }
+
+          if (!$('label.active input[name=skus]').val()) {
+              swal('Please select product first');
+              return;
+          }
+
+          var addresses = {!! json_encode(Auth::check() ? Auth::user()->addresses : []) !!};
+
+          var addressSelector = $('<select class="form-control"></select>');
+
+          addresses.forEach(function (address) {
+              addressSelector.append("<option value='" + address.id + "'>" + address.full_address + ' '+ address.contact_name + ' ' + address.contact_phone + '</option>');
+          });
+
+          swal({
+              text: 'Please select receive address',
+              content: addressSelector[0],
+              buttons: ['Cancel', 'Confirm']
+          }).then(function (ret) {
+              if (!ret) {
+                  return;
+              }
+              var req = {
+                  address_id: addressSelector.val(),
+                  sku_id: $('label.active input[name=skus]').val()
+              };
+              axios.post('{{ route('seckill_orders.store') }}', req)
+                  .then(function (response) {
+                      swal('Order submitted successfully', '', 'success')
+                          .then(() => {
+                              location.href = '/orders/' + response.data.id;
+                          });
+                  }, function (error) {
+                      if (error.response.status === 422) {
+                          var html = '<div>';
+                          _.each(error.response.data.errors, function (errors) {
+                              _.each(errors, function (error) {
+                                  html += error+'<br>';
+                              })
+                          });
+                          html += '</div>';
+                          swal({content: $(html)[0], icon: 'error'})
+                      } else if (error.response.status === 403) {
+                          swal(error.response.data.msg, '', 'error');
+                      } else {
+                          swal('System error', '', 'error');
+                      }
+                  });
+          });
+      });
   });
 </script>
 @endsection

@@ -17,6 +17,8 @@ class Order extends Model
 	const SHIP_STATUS_DELIVERED = 'delivered';
 	const SHIP_STATUS_RECEIVED = 'received';
 
+	const TYPE_SECKILL = 'seckill';
+
 	public static $refundStatusMap = [
 		self::REFUND_STATUS_PENDING => 'REFUND PENDING',
 		self::REFUND_STATUS_APPLIED => 'REFUND APPLIED',
@@ -37,6 +39,7 @@ class Order extends Model
 	public static $typeMap = [
         self::TYPE_NORMAL => 'normal product order',
         self::TYPE_CROWDFUNDING => 'crowd-funding product order',
+        self::TYPE_SECKILL => 'Second-skill product order',
     ];
 
 	protected $fillable = [
