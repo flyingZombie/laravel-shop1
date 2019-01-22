@@ -18,10 +18,13 @@ class SeckillOrderRequest extends Request
     public function rules()
     {
         return [
-            'address_id' => [
-                'required',
-                Rule::exists('user_addresses', 'id')->where('user_id', $this->user()->id)
-            ],
+
+            'address.state' => 'required',
+            'address.suburb' => 'required',
+            'address.address' => 'required',
+            'address.postcode' => 'required',
+            'address.contact_name' => 'required',
+            'address.contact_phone' => 'required',
             'sku_id' => [
                 'required',
                 function($attribute, $value, $fail) {

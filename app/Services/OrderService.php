@@ -194,18 +194,18 @@ class OrderService
 	    return $order;
     }
 
-    public function seckill(User $user, UserAddress $address, ProductSku $sku)
+    public function seckill(User $user, array $addressData, ProductSku $sku)
     {
-        $order = \DB::transaction(function () use ($user, $address, $sku ) {
+        $order = \DB::transaction(function () use ($user, $addressData, $sku ) {
 
-            $address->update(['last_used_at' => Carbon::now()]);
+            //$address->update(['last_used_at' => Carbon::now()]);
 
             $order = new Order([
                 'address' => [
-                    'address' => $address->full_address,
-                    'post_code' => $address->post_code,
-                    'contact_name' => $address->contact_name,
-                    'contact_phone' => $address->contact_phone,
+                    'address' => $addressData['address'].' '.$addressData['suburb'].' '.$addressData['state'],
+                    'post_code' => $addressData['postcode'],
+                    'contact_name' => $addressData['contact_name'],
+                    'contact_phone' => $addressData['contact_phone'],
                 ],
                 'remark' => '',
                 'total_amount' => $sku->price,
