@@ -231,6 +231,8 @@ class OrderService
                 throw new InvalidRequestException('This product is out of stock');
             }
 
+            \Redis::decr('seckill_sku_'.$sku->id);
+
             return $order;
         });
 

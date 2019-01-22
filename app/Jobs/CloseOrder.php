@@ -39,11 +39,21 @@ class CloseOrder implements ShouldQueue
         \DB::transaction(function ()
         {
             $this->order->update(['closed' => true]);
+
             foreach ($this->order->items as $item) {
+
                 $item->productSku->addStock($item->amount);
+                if ($item->order->type === Order::TYPE_SECKILL
+                    && $item->product->on_sale
+                    && !$item->product->seckill->is_after_end) {
+                    \Redis::incr('seckill_sku_'.$item->productSku->id);
+                }
             }
+
             if($this->order->couponCode){
+
                 $this->order->couponCode->changeUsed(false);
+
             }
         });
     }
